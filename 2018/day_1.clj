@@ -15,7 +15,7 @@
     (map read-string v)))
 
 
-;; Answer to Problem 1
+;; Answer to Part 1
 (reduce + freqs)
 
 
@@ -31,5 +31,5 @@
 
 (find-rep #{0} 0 '(1 -1))
 (find-rep #{0} 0 (cycle '(+3, +3, +4, -2, -4)))
-;; Answer to Problem 2
+;; Answer to Part 2
 (find-rep #{0} 0 (cycle freqs))

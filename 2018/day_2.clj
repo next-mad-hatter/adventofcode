@@ -1,6 +1,10 @@
 (ns madhat.adventofcode.day-two
   (:require [clojure.string :as str]))
 
+
+;; Day 2
+
+
 (def input "evsialkqydurohxqpwbcugtjmh
 evsialkqydurohxzssbcngtjmv
 fvlialkqydurohxzpwbcngujmf
@@ -264,7 +268,7 @@ evsialkqydurohxzpwicnxtjnf")
     (map #(into #{} %) v)))
 
 
-;; Answer to Part One
+;; Answer to Part 1
 (* (count
     (filter #(contains? % 2)
             (counted input)))
@@ -281,7 +285,7 @@ evsialkqydurohxzpwicnxtjnf")
                      (partition 2 (interleave str1 str2)))))))
 
 
-;; Answer to part Two
+;; Answer to Part 2
 (filter (fn [[_ f]] (= 1 f))
   (let [words (str/split input #"\s")]
     (into {}
