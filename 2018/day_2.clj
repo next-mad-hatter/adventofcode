@@ -285,7 +285,7 @@ evsialkqydurohxzpwicnxtjnf")
                      (partition 2 (interleave str1 str2)))))))
 
 
-;; Answer to Part 2
+;; Answer to Part 2 (almost)
 (filter (fn [[_ f]] (= 1 f))
   (let [words (str/split input #"\s")]
     (into {}

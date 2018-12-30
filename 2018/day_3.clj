@@ -1,4 +1,4 @@
-(ns madhat.adventofcode.day-two
+(ns madhat.adventofcode.day-three
   (:require [clojure.string :as str]))
 
 
@@ -1388,9 +1388,11 @@
 (defn instructions [input]
   (as-> input v
     (str/split v #"\n")
-    (map #(re-matches #".*\s+(\d+),(\d+): (\d+)+x(\d+)" %) v)
+    (map #(re-matches #"\s*#(\d+) @ (\d+),(\d+): (\d+)x(\d+)\s*" %) v)
     (map rest v)
-    (map #(map read-string %) v)))
+    (map #(map read-string %) v)
+    (map (juxt first rest) v)
+    (into {} v)))
 
 
 (defn fill [x y w h]
@@ -1402,12 +1404,12 @@
 (defn claims [input]
   (->> input
     (instructions)
-    ; (take 3)
-    (spy)
+    (vals)
+    ;; (take 3)
+    ;; (spy)
     (map (partial apply fill))
     (apply concat)
     (frequencies)))
-    ; (spy)))
 
 
 ;; Answer to Part 1
@@ -1415,3 +1417,44 @@
   (filter (fn [[k v]] (> v 1))
     (claims input)))
 ;; => 119551
+
+
+;; Part 2
+
+
+(defn free-squares [input]
+  (into #{}
+    (keys (filter (fn [[k v]] (= v 1))
+                  (claims input)))))
+
+
+(defn check-patch [input]
+  (let [free (free-squares input)]
+    (fn [patch]
+      (every? free  ; why can't we use it at the end of our threading form?
+              (-> patch
+                  (#(apply fill %)))))))
+
+
+;; Mock data
+;; (def input "#1 @ 1,3: 4x4
+;;   #2 @ 3,1: 4x4
+;;   #3 @ 5,5: 2x2")
+
+
+(def free-patch (check-patch input))
+
+
+(defn free-claims [input]
+  (let [addrs (instructions input)]
+    (keys (filter (fn [[k v]] (free-patch v))
+                  addrs))))
+
+;; Answer to Part 2
+(free-claims input)
+
+;; (defn f-claims [input]
+;;   (let [addrs (instructions input)
+;;         filled-claims (into {} (for [[k v] addrs]
+;;                                 [k (apply fill v)]]
+;;    filled-claims)
