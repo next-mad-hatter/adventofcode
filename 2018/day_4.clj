@@ -66,9 +66,22 @@
 ;; TESTS
 
 (def i (parse-input input))
+
 (def r (first i))
+
 (def g (group-by :day i))
+
 (def s (gf/fmap set-guard-id g))
 
-(pp/pp)
+(def c (reduce into (vals s)))
 
+(def d
+  (->> c
+      (group-by :guard-id)
+      (gf/fmap #(group-by :day %))
+      (gf/fmap vals)))
+      ;; (gf/fmap (fn [x] gf/fmap #(sort-by :minute %) [x]))))
+
+d
+
+(pp/pp)
