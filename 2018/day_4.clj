@@ -44,8 +44,9 @@
         minute               (.getMinute date)
         guard-id             (when (not (nil? val)) (read-string val))
         can-do               {"wakes up" :awake "falls asleep" :asleep}
-        status               (if (nil? guard-id) (can-do does-what) :awake)]
-    (into {} (filter (comp not nil? second) {:day day :minute minute :status status :guard-id guard-id}))))
+        status               (if (nil? guard-id) (can-do does-what) :awake)
+        adj-minute           (if (nil? guard-id) minute 0)]
+    (into {} (filter (comp not nil? second) {:day day :minute adj-minute :status status :guard-id guard-id}))))
 
 
 (defn parse-input [input]
@@ -65,9 +66,11 @@
 
 ;; TESTS
 
+(def spy #(do (println "DEBUG:" %) %))
+
 (def i (parse-input input))
 
-(def r (first i))
+i
 
 (def g (group-by :day i))
 
@@ -79,9 +82,14 @@
   (->> c
       (group-by :guard-id)
       (gf/fmap #(group-by :day %))
-      (gf/fmap vals)))
-      ;; (gf/fmap (fn [x] gf/fmap #(sort-by :minute %) [x]))))
+      (gf/fmap vals)
+      (gf/fmap (fn [days] (map #(sort-by :minute %) days)))))
 
 d
 
 (pp/pp)
+
+
+;; ;; NullPointerException ?! :D
+;; ((->> sort-by :minute) [{:minute 3} {:minute 0} {:minute 5}]) 
+
