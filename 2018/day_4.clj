@@ -86,15 +86,13 @@
        (gf/fmap vals)
        (gf/fmap (fn [days] (pmap #(sort-by :minute %) days)))
        (gf/fmap #(map fill-timeline %))
-       (gf/fmap (fn [days] (pmap
-                            (fn [ts] (filter #(>= (% :minute) 0) ts)) days)))))
+       (gf/fmap (fn [days] (pmap (fn [ts] (filter #(>= (% :minute) 0) ts)) days)))))
 
 
 (def timelines (create-timelines input))
 
 
 ;; Part 1
-
 ;; We don't care about days here
 
 (def max-g-id
@@ -106,6 +104,7 @@
       (key)))
 
 max-g-id
+
 
 (def max-minute
   (let [ts (get timelines max-g-id)]
@@ -119,6 +118,26 @@ max-g-id
 
 
 (* max-g-id max-minute)
+
+
+;; Part 2
+;; We don't care about days here.
+;; Now we also know that we don't care about minutes
+;; we're awake at all either.
+
+
+(def sol
+  (->> timelines
+       (gf/fmap #(reduce into %))
+       (gf/fmap (fn [d] (filter #(= (:status %) :asleep) d)))
+       (gf/fmap #(map :minute %))
+       (gf/fmap frequencies)
+       (filter (comp not-empty val))
+       (into {})
+       (gf/fmap #(apply max-key val %))
+       (apply max-key (comp second val))))
+
+(* (key sol) (first (val sol)))
 
 
 ;; DEBUG
