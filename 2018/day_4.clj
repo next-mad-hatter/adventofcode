@@ -4,7 +4,7 @@
             [clojure.algo.generic.functor :as gf :only (fmap)]))
 
 
-;; Day 3
+;; Day 4
 
 
 (def input "
@@ -33,12 +33,15 @@
 
 
 (defn shift-start [t]
+  "While the guards might start their shift before or after midnight,
+  we want to set the shift start to 00:00 exactly."
   (if (.isBefore t (.withHour t 12))
     (-> t (.withHour 0) (.withMinute 0))
     (-> t (.withHour 0) (.withMinute 0) (.plusDays 1))))
 
 
-(defn decode-record [x]
+(defn decode-record
+  [x]
   (let [[date does-what val] x
         day                  (-> date shift-start str)
         minute               (.getMinute date)
@@ -55,40 +58,95 @@
        (pmap rest)
        (pmap vec)
        (pmap #(update % 0 to-date))
-       ;; (sort-by first)
        (pmap decode-record)))
 
 
-(defn set-guard-id [timeline]
+(defn propagate-guard-id
+  "After the input had been parsed, only the 'guard begins shift' entry
+  will have a guard id.  If we group them by day, we can set guard id for
+  all records of a day using this."
+  [timeline]
   (let [g-id (:guard-id (first timeline))]
-    (map #(assoc % :guard-id g-id) timeline)))
+    (pmap #(assoc % :guard-id g-id) timeline)))
 
 
-;; TESTS
+(defn spell-out-timeline [p q]
+  "We will fill the timeline by creating an entry for each minute.
+  This computes such elements for a pair of (consequtive) timeline entries."
+  (let [x  (:minute p)
+        y  (:minute q)
+        r  (range x y)
+        ts (map #(assoc p :minute %) r)]
+    ts))
+
+
+(defn fill-timeline [t]
+  "Fill the timeline by creating an entry for each minute."
+  (let [xs t
+        ys (concat (rest t) [(assoc (first t) :minute 61)])]
+    (mapcat spell-out-timeline xs ys)))
+
+
+(defn create-timelines [input]
+  "Now we can convert our input to a map assigning to each guard (id)
+  a sequence of timelines, one for each day.  Each timeline is a sequence
+  of status changes we discovered in our input.
+  "
+  (->> input
+       (parse-input)
+       (group-by :day)
+       (gf/fmap propagate-guard-id)
+       (vals)
+       (reduce into)
+       (group-by :guard-id)
+       (gf/fmap #(group-by :day %))
+       (gf/fmap vals)
+       (gf/fmap (fn [days] (pmap #(sort-by :minute %) days)))
+       (gf/fmap #(map fill-timeline %))))
+
+
+(def timelines (create-timelines input))
+
+
+;; Part 1
+
+;; We don't care about days here
+
+(def max-g-id
+  (->> timelines
+      (gf/fmap #(reduce into %))
+      (gf/fmap #(group-by :status %))
+      (gf/fmap #(gf/fmap count %))
+      (apply max-key #(:asleep (val %)))
+      (key)))
+
+(def max-minute
+  (let [ts (get timelines max-g-id)]
+    (->> ts
+        (reduce into)
+        (filter #(= (:status %) :asleep))
+        (group-by :minute)
+        (gf/fmap count)
+        (apply max-key val)
+        (key))))
+
+(* max-g-id max-minute)
+
+;; DEBUG
 
 (def spy #(do (println "DEBUG:" %) %))
 
-(def i (parse-input input))
+(pp/pp)
 
-i
+;; TESTS
 
-(def g (group-by :day i))
+(def d (create-timelines input))
 
-(def s (gf/fmap set-guard-id g))
-
-(def c (reduce into (vals s)))
-
-(def d
-  (->> c
-      (group-by :guard-id)
-      (gf/fmap #(group-by :day %))
-      (gf/fmap vals)
-      (gf/fmap (fn [days] (map #(sort-by :minute %) days)))))
+(def t ((comp first second first) d))
 
 d
 
-(pp/pp)
-
+t
 
 ;; ;; NullPointerException ?! :D
 ;; ((->> sort-by :minute) [{:minute 3} {:minute 0} {:minute 5}]) 
