@@ -3,10 +3,7 @@
   (:require [clojure.math.combinatorics :as combo]))
 
 
-;; Day 1
-
-
-(def input (slurp "day_1a_input.txt"))
+(def input (slurp "day_1_input.txt"))
 
 
 (def input-seq
