@@ -12,21 +12,19 @@
 (defn input->topo [input]
   (let [lines (str/split input #"\n+")]
     {:width  (count (first lines))
-     :height (count lines)
      :lines  (map find-trees-in lines)}))
 
 
-(defn move
+(defn sled
   "Returns number of trees encountered when moving through given topography along given vector"
   [dx dy topo]
-  (loop [x         0
-         y         0
-         trees-cnt 0]
-    (if (>= y (:height topo))
-      trees-cnt
-      (let [trees-coors (-> topo (:lines) (nth y))
-            new-cnt     (if (trees-coors (mod x (:width topo))) (inc trees-cnt) trees-cnt)]
-        (recur (+ x dx) (+ y dy) new-cnt)))))
+  (let [width       (:width topo)
+        lines       (take-nth dy (:lines topo))
+        modmul      (fn [t] (mod (* t dx) width))
+        hits-tree   (fn [t line] (contains? line (modmul t)))]
+    (->> (map-indexed hits-tree lines)
+         (frequencies)
+         (#(get % true)))))
 
 
 ;; Part 1
@@ -37,13 +35,24 @@
    (slurp)
    (input->topo)))
 
-(move 3 1 topo) ;; => 280
+(time
+ (sled 3 1 topo))
+;; => 280
 
 
 ;; Part 2
 
-(def slopes [[1 1] [3 1] [5 1] [7 1] [1 2]])
+(def slopes [[1 1]
+             [3 1]
+             [5 1]
+             [7 1]
+             [1 2]])
 
-(defn count-trees [dx dy] (move dx dy topo))
+(defn count-trees [dx dy] (sled dx dy topo))
 
-(apply * (map (partial apply count-trees) slopes)) ;; => 4355551200
+(time
+ (->> slopes
+      (map (partial apply count-trees))
+      (apply *))
+ )
+;; => 4355551200
