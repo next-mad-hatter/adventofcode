@@ -1,7 +1,6 @@
 (ns madhat.adventofcode.day-three
   (:require [clojure.string :as str]))
 
-
 (defn find-trees-in
   "Given a line, returns the set of zero-based indices of its tree locations"
   [line]
@@ -14,7 +13,6 @@
     {:width  (count (first lines))
      :lines  (map find-trees-in lines)}))
 
-
 (defn sled
   "Returns number of trees encountered when moving through given topography along given vector"
   [dx dy topo]
@@ -25,7 +23,6 @@
     (->> (map-indexed hits-tree lines)
          (frequencies)
          (#(get % true)))))
-
 
 ;; Part 1
 
@@ -39,7 +36,6 @@
  (sled 3 1 topo))
 ;; => 280
 
-
 ;; Part 2
 
 (def slopes [[1 1]
@@ -47,7 +43,6 @@
              [5 1]
              [7 1]
              [1 2]])
-
 
 (time
  (letfn [(count-trees [dx dy] (sled dx dy topo))]
