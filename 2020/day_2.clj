@@ -1,6 +1,6 @@
 (ns madhat.adventofcode.day-two
   (:require [clojure.string :as str]
-            [clojure.algo.generic.functor :as gf :only (fmap)]
+            [clojure.algo.generic.functor :as gf :refer [fmap]]
             [clojure.math.combinatorics :as combo]))
 
 
@@ -44,9 +44,14 @@
     (= f 1)))
 
 
-(->>
- "day_2_input.txt"
- (slurp)
- (input->entries)
- (filter sat-two)
- (count))
+(def result
+  (time
+    (->>
+     "day_2_input.txt"
+     (slurp)
+     (input->entries)
+     (filter sat-two)
+     (count))))
+
+(println result)
+
