@@ -48,11 +48,10 @@
              [7 1]
              [1 2]])
 
-(defn count-trees [dx dy] (sled dx dy topo))
 
 (time
- (->> slopes
-      (map (partial apply count-trees))
-      (apply *))
- )
+ (letfn [(count-trees [dx dy] (sled dx dy topo))]
+   (->> slopes
+        (map (partial apply count-trees))
+        (apply *))))
 ;; => 4355551200
