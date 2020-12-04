@@ -42,5 +42,3 @@
 passes
 
 (count (filter valid passes))
-
-;; Part 2
