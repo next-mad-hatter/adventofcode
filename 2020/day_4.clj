@@ -4,7 +4,7 @@
    [clojure.string :as str]))
 
 (defn input->passports [input]
-  (str/split input #"\n\s*\n"))
+  (str/split input #"\R\s*\R"))
 
 (defn parse [p]
   (as-> p v
@@ -12,12 +12,13 @@
     (map #(into [] [(keyword (nth % 1)) (nth % 2)]) v)
     (into {} v)))
 
-(def passes
-  (->>
-   "day_4_input.txt"
-   slurp
-   input->passports
-   (map parse)))
+(time
+ (def passes
+   (->>
+    "day_4_input.txt"
+    slurp
+    input->passports
+    (map parse))))
 
 (defn valid [p]
   (and
@@ -39,6 +40,5 @@
        (<= 150 val 193)
        (<= 59 val 76)))))
 
-passes
-
-(count (filter valid passes))
+(time
+ (count (filter valid passes)))
