@@ -1,4 +1,4 @@
-(ns madhat.adventofcode.day-three
+(ns madhat.adventofcode.day-four
   (:require
    [clojure.set :as set]
    [clojure.string :as str]))

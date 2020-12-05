@@ -1,4 +1,4 @@
-(ns madhat.adventofcode.day-three
+(ns madhat.adventofcode.day-five
   (:require
    [clojure.string :as str]
    #_[clojure.set :as set]
@@ -40,11 +40,13 @@ nums
 
 (def part-2-answer)
 
-(for [x (range 256)
-      y (range 8)
-      :when (not (contains? nums [x y]))
-      :when (contains? nums [(dec x) y])
-      :when (contains? nums [(inc x) y])]
-  [x y])
+(apply #(+ (* 8 %1) %2)
+       (first
+        (for [x (range 256)
+              y (range 8)
+              :when (not (contains? nums [x y]))
+              :when (contains? nums [(dec x) y])
+              :when (contains? nums [(inc x) y])]
+          [x y])))
 
 part-2-answer
