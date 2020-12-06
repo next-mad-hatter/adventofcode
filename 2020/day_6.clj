@@ -10,15 +10,15 @@
   (str/split input #"\R\s*\R"))
 
 (defn parse-1 [p]
-  (as-> p $
-    (into #{} $)
-    (remove #{\newline} $)))
+  (->> p
+    set
+    (remove #{\newline \return})))
 
 (defn parse-2 [p]
-  (as-> p $
-    (str/split $ #"\R")
-    (map (partial into #{}) $)
-    (apply set/intersection $)))
+  (->> p
+    str/split-lines
+    (map set)
+    (apply set/intersection)))
 
 (defn solver [parser]
   (fn [input]
@@ -29,16 +29,9 @@
       (map count)
       (apply +))))
 
-(def part-1-answer
-  (time
-   ((solver parse-1) "day_6_input.txt")))
-
-(def part-2-answer
-  (time
-   ((solver parse-2) "day_6_input.txt")))
-
-part-1-answer
-;; => 6778
-
-part-2-answer
-;; => 3406
+(time
+ (as-> [parse-1 parse-2] $
+   (map solver $)
+   ((partial apply juxt) $)
+   ($ "day_6_input.txt")))
+;; => [6778 3406]
