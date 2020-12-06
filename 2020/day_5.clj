@@ -11,12 +11,10 @@
 
 (defn parse [p]
   (as-> p $
-    (str/replace $ #"F" "0")
-    (str/replace $ #"B" "1")
-    (str/replace $ #"L" "0")
-    (str/replace $ #"R" "1")
-    ((juxt #(subs % 0 7) #(subs % 7 10)) $)
-    (map #(. Integer parseInt % 2) $)))
+    ((partial map {\F 0 \B 1 \L 0 \R 1}) $)
+    (apply str $)
+    (Integer/parseInt $ 2)
+    ((juxt #(-> % (/ 8) int) #(mod % 8)) $)))
 
 (time
  (def nums
@@ -31,22 +29,19 @@
  (def part-1-answer
    (apply max (map (partial apply #(+ (* 8 %1) %2)) nums))))
 
-part-1-answer
-
-nums
+part-1-answer ;; => 959
 
 (defn zip [& colls]
   (partition (count colls) (apply interleave colls)))
 
-(def part-2-answer)
+(def part-2-answer
+  (apply #(+ (* 8 %1) %2)
+         (first
+          (for [x (range 256)
+                y (range 8)
+                :when (not (contains? nums [x y]))
+                :when (contains? nums [(dec x) y])
+                :when (contains? nums [(inc x) y])]
+            [x y]))))
 
-(apply #(+ (* 8 %1) %2)
-       (first
-        (for [x (range 256)
-              y (range 8)
-              :when (not (contains? nums [x y]))
-              :when (contains? nums [(dec x) y])
-              :when (contains? nums [(inc x) y])]
-          [x y])))
-
-part-2-answer
+part-2-answer ;; => 527
