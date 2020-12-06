@@ -9,6 +9,13 @@
 (defn split-input [input]
   (str/split input #"\R"))
 
+;;
+;; Another possibility for decoding:
+;; (str/escape "FLBR" {\F 0 \L 0 \B 1 \R 1})
+;;
+;; Also, there's actually no need in these tasks
+;; to split the numbers into the upper/lower parts
+;;
 (defn parse [p]
   (as-> p $
     ((partial map {\F 0 \B 1 \L 0 \R 1}) $)
