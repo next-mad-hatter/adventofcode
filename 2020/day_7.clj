@@ -13,6 +13,9 @@
 ;; TODO: check out kibit
 ;; TODO: cider-interrupt does not seem to work with my current doom-emacs setup
 
+;; TODO: check out loom --provides subgraph-reachable-from & nested-count
+;;       functions which we could use instead of rolling our own below
+
 (defn spy
   ([val] (spy "DBG:" val))
   ([msg val] (print msg " ") (pp/pprint val) val))
