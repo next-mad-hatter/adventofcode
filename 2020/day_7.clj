@@ -5,9 +5,7 @@
    [clojure.algo.generic.functor :as gf :refer [fmap]]
    [ubergraph.core :as uber]
    [clojure.pprint :as pp]
-   [ubergraph.alg :as ga :refer [topsort]]
-   #_[clojure.math.combinatorics :as combo]
-   #_[clojure.zip :as zip]))
+   [ubergraph.alg :as ga :refer [topsort]]))
 
 ;; TODO: check out cider debugging & debux, specter & instaparse
 ;; TODO: check out kibit

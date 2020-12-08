@@ -1,10 +1,7 @@
 (ns madhat.adventofcode.day-six
   (:require
    [clojure.string :as str]
-   [clojure.set :as set]
-   #_[clojure.algo.generic.functor :as gf :refer [fmap]]
-   #_[clojure.math.combinatorics :as combo]
-   #_[clojure.zip :as zip]))
+   [clojure.set :as set]))
 
 (defn split-input [input]
   (str/split input #"\R\s*\R"))

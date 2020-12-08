@@ -1,17 +1,6 @@
 (ns madhat.adventofcode.day-eight
   (:require
-   [clojure.string :as str]
-   [clojure.pprint :as pp]
-   [clojure.set :as set]
-   #_[clojure.algo.generic.functor :as gf :refer [fmap]]
-   #_[clojure.math.combinatorics :as combo]
-   #_[ubergraph.core :as uber]
-   #_[ubergraph.alg :as ga :refer [topsort]]
-   #_[clojure.zip :as zip]))
-
-(defn spy
-  ([val] (spy "DBG:" val))
-  ([msg val] (print msg " ") (pp/pprint val) val))
+   [clojure.string :as str]))
 
 (defn parse-line [line]
   (let [chunks (str/split line #"\s+")
@@ -70,15 +59,14 @@ answer-1
         patch  (assoc instr :op new-op)]
     (assoc prg n patch)))
 
-(defn indices [pred coll]
+(defn indices-of [pred coll]
    (keep-indexed #(when (pred %2) %1) coll))
 
-(defn find-first
-  [f coll]
+(defn find-first [f coll]
   (first (filter f coll)))
 
 (def answer-2
-  (let [ps   (indices #(#{:jmp :nop} (:op %)) input)
+  (let [ps   (indices-of #(#{:jmp :nop} (:op %)) input)
         prgs (map (partial patch input) ps)
         res  (map run-vm prgs)]
     (:acc (find-first #(= 0 (:exit %)) res))))

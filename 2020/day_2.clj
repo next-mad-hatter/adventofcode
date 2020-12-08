@@ -1,7 +1,6 @@
 (ns madhat.adventofcode.day-two
   (:require [clojure.string :as str]
-            [clojure.algo.generic.functor :as gf :refer [fmap]]
-            [clojure.math.combinatorics :as combo]))
+            [clojure.algo.generic.functor :as gf :refer [fmap]]))
 
 
 (defn match->entry [matches]

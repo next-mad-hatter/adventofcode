@@ -9,14 +9,28 @@
    #_[ubergraph.alg :as ga :refer [topsort]]
    #_[clojure.zip :as zip]))
 
+;;
+;;  helpers
+;;
+
 (defn spy
   ([val] (spy "DBG:" val))
   ([msg val] (print msg " ") (pp/pprint val) val))
 
+(defn indices-of [pred coll]
+   (keep-indexed #(when (pred %2) %1) coll))
+
+(defn find-first [f coll]
+  (first (filter f coll)))
+
+;;
+;;  input
+;;
+
 (defn parse-input [input]
   (-> input
-       str/lower-case
-       (str/split #"\R")))
+      str/lower-case
+      (str/split #"\R")))
 
 (time
  (def input
@@ -31,6 +45,8 @@
    0))
 
 answer-1
+
+;;  Part 2
 
 (time
  (def answer-2
