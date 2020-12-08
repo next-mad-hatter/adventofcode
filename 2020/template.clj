@@ -1,9 +1,9 @@
-(ns madhat.adventofcode.day-six
+(ns madhat.adventofcode
   (:require
    [clojure.string :as str]
    [clojure.pprint :as pp]
-   [clojure.set :as set]
-   [clojure.algo.generic.functor :as gf :refer [fmap]]
+   #_[clojure.set :as set]
+   #_[clojure.algo.generic.functor :as gf :refer [fmap]]
    #_[clojure.math.combinatorics :as combo]
    #_[ubergraph.core :as uber]
    #_[ubergraph.alg :as ga :refer [topsort]]
@@ -14,7 +14,7 @@
   ([msg val] (print msg " ") (pp/pprint val) val))
 
 (defn parse-input [input]
-  (->> input
+  (-> input
        str/lower-case
        (str/split #"\R")))
 
@@ -28,25 +28,12 @@
 
 (time
  (def answer-1
-   (count (all-predecessors graph "shiny gold"))))
+   0))
 
-answer-1 ;; => 185
-
-;; Part 2
-
-(defn count-contents [g]
-  (memoize
-   (fn [n]
-     (let [ms       (uber/successors g n)
-           ws       (map (partial uber/weight graph n) ms)
-           subsums  (map (count-contents g) ms)
-           subtotal (apply + (map * ws subsums))]
-       (+ (apply + ws) subtotal)))))
-
-(def counter (count-contents graph))
+answer-1
 
 (time
  (def answer-2
-   (counter "shiny gold")))
+   1))
 
-answer-2 ;; => 89084
+answer-2
