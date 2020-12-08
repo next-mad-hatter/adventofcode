@@ -29,13 +29,13 @@
          visited #{}]
     (if (>= (:ptr state) (count prg))
       (assoc state :exit 0)
-      (let [instr       (nth prg (:ptr state))
-            delta       (((:op instr) fw) (:arg instr))
-            new-state   (merge-with + state delta)
-            new-visited (conj visited (:ptr state))]
-        (if (= visited new-visited)
+      (let [instr        (nth prg (:ptr state))
+            delta        (((:op instr) fw) (:arg instr))
+            next-state   (merge-with + state delta)
+            next-visited (conj visited (:ptr state))]
+        (if (= visited next-visited)
           (assoc state :exit 1)
-          (recur new-state new-visited))))))
+          (recur next-state next-visited))))))
 
 (def run-vm (partial evaluate instructions))
 
