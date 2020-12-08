@@ -3,10 +3,9 @@
    [clojure.string :as str]))
 
 (defn parse-line [line]
-  (let [chunks (str/split line #"\s+")
-        op     (keyword (first chunks))
-        num    (Long/parseLong (first (reverse chunks)))]
-    {:op op :arg num}))
+  (let [[op num] (str/split line #"\s+")]
+    {:op  (keyword op)
+     :arg (Long/parseLong num)}))
 
 (defn parse-input [input]
   (->> input
@@ -53,21 +52,15 @@ answer-1
 
 ;; Part 2
 
-(defn patch [prg n]
-  (let [instr  (prg n)
-        new-op ({:nop :jmp :jmp :nop} (:op instr))
-        patch  (assoc instr :op new-op)]
-    (assoc prg n patch)))
-
 (defn indices-of [pred coll]
-   (keep-indexed #(when (pred %2) %1) coll))
+  (keep-indexed #(when (pred %2) %1) coll))
 
 (defn find-first [f coll]
   (first (filter f coll)))
 
 (def answer-2
   (let [ps   (indices-of #(#{:jmp :nop} (:op %)) input)
-        prgs (map (partial patch input) ps)
+        prgs (map #(update-in input [% :op] {:nop :jmp :jmp :nop}) ps)
         res  (map run-vm prgs)]
     (:acc (find-first #(= 0 (:exit %)) res))))
 
