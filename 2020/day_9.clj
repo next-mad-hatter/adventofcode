@@ -1,4 +1,4 @@
-(ns madhat.adventofcode
+(ns madhat.adventofcode.day-nine
   (:require
    [clojure.string :as str]
    [clojure.math.combinatorics :as combo]))
@@ -46,31 +46,31 @@ answer-1
 
 ;;  Part 2
 
-(defn starts-with [n s coll memo]
-  (loop [n n
-         s s
-         prefix []]
-    (let [k [n s]
-          ret (fn [v] (swap! memo #(assoc % k v)) v)
-          x (nth coll n)]
-      (cond
-        (contains? @memo k) (@memo k)
-        (and (= x s) (empty? prefix)) (ret nil)
-        (= x s) (ret prefix)
-        (> x s) (ret nil)
-        (>= (inc n) (count coll)) (ret nil)
-        :else (recur (inc n) (- s x) (conj prefix x))))))
+(defn find-subsequence [nums target]
+  (loop  [pos 0
+          sums []]
+    (let [x (get nums pos)]
+      (if (nil? x) nil
+          (let [next-sums  (conj (mapv #(+ x %) sums) x)
+                short-sums (vec (drop-while #(< target %) next-sums))
+                candidate  (first short-sums)]
+            (if (= target candidate)
+              (subvec nums (- pos -1 (count short-sums)) (inc pos))
+              (recur (inc pos) short-sums)))))))
 
-(def memo (atom {}))
-(time
- (def answer-2
-   (->> input
-        count
-        range
-        (map #(starts-with % answer-1 input memo))
-        (find-first (fn [[_ v]] (some? v)))
-        ((juxt (partial apply min) (partial apply max)))
-        (apply +))))
+(defn scan-subsequences [input target]
+  (let [acceptable (fn [x] (< x target))]
+    (->> input
+         (partition-by acceptable)
+         (filter (comp acceptable first))
+         (filter #(> (count %) 1))
+         (map vec)
+         (map #(find-subsequence % target))
+         (filter some?)
+         first
+         ((juxt (partial apply min) (partial apply max))))))
+
+(def answer-2 (apply + (scan-subsequences input answer-1)))
 
 answer-2
 ;; => 62
