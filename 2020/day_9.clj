@@ -46,25 +46,29 @@ answer-1
 
 ;;  Part 2
 
-(defn starts-with [n s coll]
+(defn starts-with [n s coll memo]
   (loop [n n
          s s
          prefix []]
-    (let [x (nth coll n)]
+    (let [k [n s]
+          ret (fn [v] (swap! memo #(assoc % k v)) v)
+          x (nth coll n)]
       (cond
-        (and (= x s) (empty? prefix)) nil
-        (= x s) prefix
-        (> x s) nil
-        (>= (inc n) (count coll)) nil
+        (contains? @memo k) (@memo k)
+        (and (= x s) (empty? prefix)) (ret nil)
+        (= x s) (ret prefix)
+        (> x s) (ret nil)
+        (>= (inc n) (count coll)) (ret nil)
         :else (recur (inc n) (- s x) (conj prefix x))))))
 
+(def memo (atom {}))
 (time
  (def answer-2
    (->> input
         count
         range
-        (map #(starts-with % answer-1 input))
-        (find-first some?)
+        (map #(starts-with % answer-1 input memo))
+        (find-first (fn [[_ v]] (some? v)))
         ((juxt (partial apply min) (partial apply max)))
         (apply +))))
 
