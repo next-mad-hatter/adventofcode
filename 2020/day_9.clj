@@ -1,4 +1,4 @@
-(ns madhat.adventofcode.day-nine
+(ns madhat.adventofcode
   (:require
    [clojure.string :as str]
    [clojure.math.combinatorics :as combo]))
@@ -15,7 +15,7 @@
   (as-> input $
     (str/lower-case $)
     (str/split $ #"\R")
-    (map #(Long/parseLong %) $)))
+    (mapv #(Long/parseLong %) $)))
 
 (time
  (def input
@@ -46,32 +46,44 @@ answer-1
 
 ;;  Part 2
 
-(defn find-subsequence [nums target]
-  (loop  [pos 0
-          sums []]
+(defn pos-yields-sum [nums pos sum]
+  (loop [pos pos
+         sum sum
+         l-min nil
+         l-max nil]
     (let [x (get nums pos)]
-      (if (nil? x) nil
-          (let [next-sums  (conj (mapv #(+ x %) sums) x)
-                short-sums (vec (drop-while #(< target %) next-sums))
-                candidate  (first short-sums)]
-            (if (= target candidate)
-              (subvec nums (- pos -1 (count short-sums)) (inc pos))
-              (recur (inc pos) short-sums)))))))
+      (cond
+        (nil? x) nil
+        (> x sum) nil
+        (and (= x sum) (nil? l-min)) nil
+        (= x sum) [l-min l-max]
+        :else (recur
+               (inc pos)
+               (- sum x)
+               (apply min (remove nil? [l-min x]))
+               (apply max (remove nil? [l-max x])))))))
 
-(defn scan-subsequences [input target]
-  (let [acceptable (fn [x] (< x target))]
-    (->> input
-         (partition-by acceptable)
-         (filter (comp acceptable first))
-         (filter #(> (count %) 1))
-         (map vec)
-         (map #(find-subsequence % target))
-         (filter some?)
-         first
-         ((juxt (partial apply min) (partial apply max))))))
+(defn scan-chunk [nums target]
+   (->> nums
+        count
+        range
+        (map #(pos-yields-sum nums % target))
+        (find-first some?)))
 
-(def answer-2 (apply + (scan-subsequences input answer-1)))
+(time
+ (def answer-2
+   (let [acceptable (fn [x] (< x answer-1))]
+     (->> input
+          (partition-by acceptable)
+          (filter (comp acceptable first))
+          (filter #(< 1 (count %)))
+          (map vec)
+          shuffle
+          (map #(scan-chunk % answer-1))
+          (find-first some?)
+          (apply +)))))
 
 answer-2
 ;; => 62
 ;; => 3340942
+
