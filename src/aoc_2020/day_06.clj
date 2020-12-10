@@ -1,10 +1,8 @@
-(ns madhat.adventofcode.day-six
+(ns aoc-2020.day-06
   (:require
+   [aoc-2020.util :as util]
    [clojure.string :as str]
    [clojure.set :as set]))
-
-(defn split-input [input]
-  (str/split input #"\R\s*\R"))
 
 (defn parse-1 [p]
   (->> p
@@ -20,15 +18,14 @@
 (defn solver [parser]
   (fn [input]
      (->> input
-      slurp
-      split-input
-      (map parser)
-      (map count)
-      (apply +))))
+          (util/fetch-chunks #"\R\s*\R")
+          (map parser)
+          (map count)
+          (apply +))))
 
 (time
  (as-> [parse-1 parse-2] $
    (map solver $)
    ((partial apply juxt) $)
-   ($ "day_6_input.txt")))
+   ($ "2020/day_06_input.txt")))
 ;; => [6778 3406]

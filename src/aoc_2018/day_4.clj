@@ -1,4 +1,4 @@
-(ns madhat.adventofcode.day-three
+(ns aoc-2018.day-4
   (:require [clojure.string :as str]
             [clojure.pprint :as pp]
             [clojure.algo.generic.functor :as gf :only (fmap)]))

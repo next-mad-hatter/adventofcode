@@ -1,9 +1,7 @@
-(ns madhat.adventofcode.day-five
+(ns aoc-2020.day-05
   (:require
+   [aoc-2020.util :as util]
    [clojure.string :as str]))
-
-(defn split-input [input]
-  (str/split input #"\R"))
 
 ;;
 ;; Another possibility for decoding:
@@ -22,9 +20,8 @@
 (time
  (def nums
    (->>
-    "day_5_input.txt"
-    slurp
-    split-input
+    "2020/day_05_input.txt"
+    util/fetch-lines
     (map parse)
     (into #{}))))
 

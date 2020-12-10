@@ -1,18 +1,16 @@
-(ns madhat.adventofcode.day-two
-  (:require [clojure.string :as str]
-            [clojure.algo.generic.functor :as gf :refer [fmap]]))
-
+(ns aoc-2020.day-02
+  (:require
+   [aoc-2020.util :as util]
+   [clojure.algo.generic.functor :as gf :refer [fmap]]))
 
 (defn match->entry [matches]
   (gf/fmap #(nth matches %) {:min 1 :max 2 :char 3 :pw 4}))
 
-
 (defn input->entries [input]
   (as-> input v
-    (str/split v #"\n+")
+    (util/fetch-lines v)
     (map #(re-matches #"(\d+)-(\d+)\s+(.):\s+(.*)" %) v)
     (map match->entry v)))
-
 
 ;; Part 1
 
@@ -21,14 +19,14 @@
         f (count (filter #{c} (seq (:pw entry))))]
     (<= (read-string (:min entry)) f (read-string (:max entry)))))
 
-
-(->>
- "day_2_input.txt"
- (slurp)
- (input->entries)
- (filter sat-one)
- (count))
-
+(util/spy
+ (time
+  (->>
+   "2020/day_02_input.txt"
+   input->entries
+   (filter sat-one)
+   count)))
+;; => 454
 
 ;; Part 2
 
@@ -42,15 +40,11 @@
         f       (count (filter  #{c} [one two]))]
     (= f 1)))
 
-
-(def result
-  (time
-    (->>
-     "day_2_input.txt"
-     (slurp)
-     (input->entries)
-     (filter sat-two)
-     (count))))
-
-(println result)
-
+(util/spy
+ (time
+  (->>
+   "2020/day_02_input.txt"
+   input->entries
+   (filter sat-two)
+   count)))
+;; => 649

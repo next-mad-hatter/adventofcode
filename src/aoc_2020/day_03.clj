@@ -1,5 +1,6 @@
-(ns madhat.adventofcode.day-three
-  (:require [clojure.string :as str]))
+(ns aoc-2020.day-03
+  (:require
+   [aoc-2020.util :as util]))
 
 (defn find-trees-in
   "Given a line, returns the set of zero-based indices of its tree locations"
@@ -8,8 +9,8 @@
        (keep-indexed #(when (= \# %2) %1))
        (into #{})))
 
-(defn input->topo [input]
-  (let [lines (str/split input #"\n+")]
+(defn load-topo [filename]
+  (let [lines (util/fetch-lines filename)]
     {:width  (count (first lines))
      :lines  (map find-trees-in lines)}))
 
@@ -26,11 +27,7 @@
 
 ;; Part 1
 
-(def topo
-  (->>
-   "day_3_input.txt"
-   (slurp)
-   (input->topo)))
+(def topo (load-topo "2020/day_03_input.txt"))
 
 (time
  (sled 3 1 topo))

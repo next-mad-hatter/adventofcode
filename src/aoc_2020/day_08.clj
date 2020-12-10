@@ -1,5 +1,6 @@
-(ns madhat.adventofcode.day-eight
+(ns aoc-2020.day-08
   (:require
+   [aoc-2020.util :as util]
    [clojure.string :as str]))
 
 (defn parse-line [line]
@@ -9,15 +10,12 @@
 
 (defn parse-input [input]
   (->> input
-       str/lower-case
-       str/split-lines
+       util/fetch-lines
+       (map str/lower-case)
        (mapv parse-line)))
 
 (time
- (def input
-   (->> "day_8_input.txt"
-        slurp
-        parse-input)))
+ (def input (parse-input "2020/day_08_input.txt")))
 
 (def instructions
   {:nop #(do % {:ptr 1})
@@ -49,6 +47,7 @@
    (:acc simulated))
 
 answer-1
+;; => 1753
 
 ;; Part 2
 
@@ -65,4 +64,4 @@ answer-1
     (:acc (find-first #(= 0 (:exit %)) res))))
 
 answer-2
-
+;; => 733

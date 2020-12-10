@@ -1,10 +1,7 @@
-(ns madhat.adventofcode.day-four
+(ns aoc-2020.day-04
   (:require
-   [clojure.set :as set]
-   [clojure.string :as str]))
-
-(defn input->passports [input]
-  (str/split input #"\R\s*\R"))
+   [aoc-2020.util :as util]
+   [clojure.set :as set]))
 
 (defn parse [p]
   (as-> p v
@@ -15,9 +12,8 @@
 (time
  (def passes
    (->>
-    "day_4_input.txt"
-    slurp
-    input->passports
+    "2020/day_04_input.txt"
+    (util/fetch-chunks #"\R\s*\R")
     (map parse))))
 
 (defn valid [p]

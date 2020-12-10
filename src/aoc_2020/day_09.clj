@@ -1,27 +1,18 @@
-(ns madhat.adventofcode
+(ns aoc-2020.day-09
   (:require
-   [clojure.string :as str]
+   [aoc-2020.util :as util]
    [clojure.math.combinatorics :as combo]))
 
-;; (def input-file "day_9_test.txt")
+;; (def input-file "2020/day_09_test.txt")
 ;; (def cont-length 5)
-(def input-file "day_9_input.txt")
+(def input-file "2020/day_09_input.txt")
 (def cont-length 25)
 
 (defn find-first [f coll]
   (first (filter f coll)))
 
-(defn parse-input [input]
-  (as-> input $
-    (str/lower-case $)
-    (str/split $ #"\R")
-    (mapv #(Long/parseLong %) $)))
-
 (time
- (def input
-   (->> input-file
-        slurp
-        parse-input)))
+ (def input (util/fetch-numbers input-file)))
 
 ;; Part 1
 
@@ -86,4 +77,3 @@ answer-1
 answer-2
 ;; => 62
 ;; => 3340942
-

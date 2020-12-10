@@ -1,4 +1,4 @@
-(ns madhat.adventofcode.day-three
+(ns aoc-2018.day-3
   (:require [clojure.string :as str]))
 
 

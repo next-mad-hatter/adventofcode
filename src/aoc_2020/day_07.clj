@@ -1,17 +1,13 @@
-(ns madhat.adventofcode.day-seven
+(ns aoc-2020.day-07
   (:require
-   [clojure.string :as str]
+   [aoc-2020.util :as util]
    [clojure.set :as set]
    [clojure.algo.generic.functor :as gf :refer [fmap]]
    [ubergraph.core :as uber]
    [clojure.pprint :as pp]
    [ubergraph.alg :as ga :refer [topsort]]))
 
-;; TODO: check out cider debugging & debux, specter & instaparse
-;; TODO: check out kibit
-;; TODO: cider-interrupt does not seem to work with my current doom-emacs setup
-
-;; TODO: check out loom --provides subgraph-reachable-from & nested-count
+;; TODO: check out loom, which provides subgraph-reachable-from & nested-count
 ;;       functions which we could use instead of rolling our own below
 
 (defn spy
@@ -27,7 +23,7 @@
 
 (defn parse-input [input]
   (->> input
-       str/lower-case
+       util/fetch-whole
        (re-seq #"(.+)\s+bags contain\s+(.+)\R")
        (map rest)
        (map vec)
@@ -36,8 +32,7 @@
 
 (time
  (def graph
-   (->> "day_7_input.txt"
-        slurp
+   (->> "2020/day_07_input.txt"
         parse-input
         uber/digraph)))
 
