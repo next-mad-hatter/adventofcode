@@ -1,6 +1,5 @@
 (ns aoc-2020.day-10-test
   (:require [aoc-2020.day-10 :as sut]
-            ;; [clojure.math.combinatorics :as combo]
             [clojure.test :as t]))
 
 (t/deftest complete-path
