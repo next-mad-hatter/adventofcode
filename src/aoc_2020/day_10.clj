@@ -52,7 +52,7 @@
        (let [candidates (filter #(<= (- % 3) src %) vertices)
              subpaths   (map (fn [v] (filter #(> % v) vertices)) candidates)
              solutions  (map path-counter candidates subpaths)]
-         (apply + solutions))))))
+          (apply + solutions))))))
 
 (defn part-2 []
   (time
@@ -62,3 +62,4 @@
 (time
  (part-2))
 ;; => (8 19208 42313823813632)
+

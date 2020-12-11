@@ -14,7 +14,6 @@
    #_[clojure.zip :as zip]))
 
 ;; TODO: check out kibit
-;; TODO: cider-interrupt does not seem to work with my current doom-emacs setup
 
 (util/fetch-whole "2020/day_01_test.txt")
 
