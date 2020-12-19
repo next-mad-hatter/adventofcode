@@ -2,8 +2,7 @@
   (:require
    [aoc-2020.util :as util]
    [clojure.string :as str]
-   [clojure.edn :as edn]
-   #_[clojure.test :as t]))
+   [clojure.edn :as edn]))
 
 (defn parse-line [line]
   (->> line
@@ -20,7 +19,7 @@
 (defn move [pos dir val]
   (mapv + pos (map #(* val %) dir)))
 
-(defn step [state [op val]]
+(defn step-one [state [op val]]
   (let [dir-ops {:E 0 :N 1 :W 2 :S 3}
         dir->delta [[1 0] [0 1] [-1 0] [0 -1]]]
     (cond
@@ -35,13 +34,13 @@
 
       :else (throw (Exception. "Not implemented")))))
 
-(def init {:pos [0 0] :dir 0})
+(def init-one {:pos [0 0] :dir 0})
 
 (defn part-1 [filename]
   (->> filename
        util/fetch-lines
        (map parse-line)
-       (reduce step init)
+       (reduce step-one init-one)
        :pos
        (map #(Math/abs %))
        (apply +)))
@@ -52,6 +51,35 @@
 (part-1 "2020/day_12_input.txt")
 ;; => 1603
 
-;;
-;; TODO: Part 2
-;;
+(def init-two {:pos [0 0] :dir [10 1]})
+
+(defn rotate-vec [[x y] n]
+  ([[x y] [(- y) x] [(- x) (- y)] [y (- x)]] n))
+
+(defn step-two [state [op val]]
+  (let [dir-ops {:E 0 :N 1 :W 2 :S 3}
+        dir->delta [[1 0] [0 1] [-1 0] [0 -1]]]
+    (cond
+      (contains? dir-ops op)
+      (update state :dir #(move % (dir->delta (dir-ops op)) val))
+
+      (#{:L :R} op)
+      (update state :dir #(rotate-vec % (rotate 0 op val)))
+
+      (= :F op)
+      (update state :pos #(move % (:dir state) val))
+
+      :else (throw (Exception. "Not implemented")))))
+
+(defn part-2 [filename]
+  (->> filename
+       util/fetch-lines
+       (map parse-line)
+       (reduce step-two init-two)
+       :pos
+       (map #(Math/abs %))
+       (apply +)))
+
+(part-2 "2020/day_12_test.txt")
+
+(part-2 "2020/day_12_input.txt")
