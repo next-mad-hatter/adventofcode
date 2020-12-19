@@ -2,7 +2,8 @@
   (:require
    [aoc-2020.util :as util]
    [clojure.string :as str]
-   [clojure.edn :as edn]))
+   [clojure.edn :as edn]
+   #_[clojure.core.matrix :as mat]))
 
 (defn parse-line [line]
   (->> line
@@ -48,13 +49,21 @@
 (part-1 "2020/day_12_test.txt")
 ;; => 25
 
-(part-1 "2020/day_12_input.txt")
+(time
+ (part-1 "2020/day_12_input.txt"))
 ;; => 1603
 
 (def init-two {:pos [0 0] :dir [10 1]})
 
 (defn rotate-vec [[x y] n]
-  ([[x y] [(- y) x] [(- x) (- y)] [y (- x)]] n))
+  ([[x y] [(- y) x] [(- x) (- y)] [y (- x)]] n)
+  ;; (let [rot (mat/matrix [[0 -1]
+  ;;                        [1 0]])
+  ;;       op (fn [[x y]] (mapv int (flatten (mat/mmul rot (mat/column-matrix [x y])))))
+  ;;       its (iterate op [x y])
+  ;;       ]
+  ;;   (nth its n))
+  )
 
 (defn step-two [state [op val]]
   (let [dir-ops {:E 0 :N 1 :W 2 :S 3}
@@ -82,4 +91,5 @@
 
 (part-2 "2020/day_12_test.txt")
 
-(part-2 "2020/day_12_input.txt")
+(time
+ (part-2 "2020/day_12_input.txt"))
