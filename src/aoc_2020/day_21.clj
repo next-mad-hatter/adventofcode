@@ -14,7 +14,7 @@
 
 (defn input->inclusions [input]
   (apply merge-with set/intersection
-         (for [[algs, ings] input, a algs] {a , (set ings)})))
+         (for [[algs, ings] input, a algs] {a (set ings)})))
 
 (defn translate [inclusions]
   (loop [dictionary {}
