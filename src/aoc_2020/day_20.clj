@@ -3,8 +3,7 @@
             [clojure.algo.generic.functor :refer [fmap]]
             [clojure.edn :as edn]
             [clojure.set :as set]
-            [clojure.string :as str]
-            #_[taoensso.tufte :as tufte :refer [p profile]]))
+            [clojure.string :as str]))
 
 (defn read-tile-nr [input]
   (->> input (re-find #"\d+$") edn/read-string))
@@ -35,11 +34,15 @@
   "All elements of D_4 as actions on a tile"
   (let [rotations [identity rot (comp rot rot) (comp rot rot rot)]
         flipped (mapv #(comp flip %) rotations)]
-    (concat rotations flipped)))
+    (vec (concat rotations flipped))))
 
 (def sym-count (count actions))
 
 (assert (= 8 sym-count))
+
+;;
+;; Part 1
+;;
 
 (def boundary-of-tile
   (juxt first #(mapv last %) last #(mapv first %)))
@@ -75,7 +78,8 @@
 
 (defn aligns
   "Checks if if a tile t oriented as o in cell [x y]
-  would align with its neighbours as set in given (partial) solution"
+  would align with its neighbours as set in given (partial) solution;
+  coordinates use screen convetion, i.e. inverted y-axis"
   [get-border solution [x y] [t o]]
   (cond
     (some-and-not= (get-border (solution [(dec x) y]) 1) (get-border [t o] 3)) false
@@ -125,11 +129,136 @@
                                 (set (keys tiles))
                                 {})
         w (dec grid-width)
-        answer (apply * (mapv (fmap first solution) [[0 0] [0 w] [w 0] [w w]]))]
-    [answer solution]))
+        _ (assert (some? solution) "No solution found")
+        answer (apply * (mapv (fmap first solution) [[0 0] [0 w] [w 0] [w w]]))
+        transformed-tiles (fmap #((actions (second %)) (tiles (first %))) solution)]
+    [answer transformed-tiles]))
+
+;;
+;; Part 2
+;;
+(def inner (comp butlast rest))
+
+(defn preprocess [tiles]
+  (->> tiles
+       (fmap inner)
+       (fmap (partial map inner))
+       (fmap #(fmap (partial map ["." "#"]) %))))
+
+;; FIXME: deconvolute this
+(defn glue [tiles]
+  (vec
+   (apply concat
+          (for [y (sort (into #{} (map first (keys tiles))))]
+            (apply map (comp vec concat)
+                   (for [x (sort (into #{} (map second (keys tiles))))]
+                     (tiles [x y])))))))
+
+(def assemble (comp glue preprocess))
+
+(defn img->str [img]
+  (->> img
+       (map (partial apply str))
+       (str/join "\n")))
+
+(defn all-images [tiles]
+  (mapv #(img->str (% (assemble tiles))) actions))
+
+;; FIXME: can we improve the replacement?
+(defn m-pattern [n]
+  (re-pattern
+   (apply str
+          "(.{" n "})(..................)#(...*)\n"
+          "(.{" n "})#(....)##(....)##(....)###(.*)\n"
+          "(.{" n "})(.)#(..)#(..)#(..)#(..)#(..)#(...)(.*)\n")))
+
+(def m-replacement
+  (apply str
+         "$1$2O$3\n"
+         "$4O$5OO$6OO$7OOO$8\n"
+         "$9$10O$11O$12O$13O$14O$15O$16$17\n"))
+
+(defn show-monsters [img]
+  (let [w (-> img (str/split #"\n") first count)
+        tr (fn [offset] #(str/replace % (m-pattern offset) m-replacement))
+        trs (map tr (range (- w 19)))]
+    (reduce (fn [i f] (f i)) img trs)))
+
+(defn count-meshes [s]
+  (->> s seq (filter #{\#}) count))
+
+(defn solve-part-2 [tiles]
+  (->> tiles
+       all-images
+       (map show-monsters)
+       (map count-meshes)
+       (apply min)))
+
+;;
+;; Results
+;;
 
 (time
- (def part-1-solutions (mapv solve-part-1 ["2020/day_20_small.txt" "2020/day_20_input.txt" "2020/day_20_test.txt"])))
+ (def part-1-solutions (mapv solve-part-1 ["2020/day_20_small.txt" "2020/day_20_test.txt" "2020/day_20_input.txt"])))
 
 (map first part-1-solutions)
-;; => (110355024 15003787688423 20899048083289)
+;; => (110355024 20899048083289 15003787688423)
+
+(def all-tiles
+  (mapv second part-1-solutions))
+
+(time
+ (mapv solve-part-2 all-tiles))
+;; => [8 273 1705]
+
+(def test-tiles (all-tiles 1))
+
+(.indexOf (all-images test-tiles) ".#.#..#.##...#.##..#####
+###....#.#....#..#......
+##.##.###.#.#..######...
+###.#####...#.#####.#..#
+##.#....#.##.####...#.##
+...########.#....#####.#
+....#..#...##..#.#.###..
+.####...#..#.....#......
+#..#.##..#..###.#.##....
+#.####..#.####.#.#.###..
+###.#.#...#.######.#..##
+#.####....##..########.#
+##..##.#...#...#.#.#.#..
+...#..#..#.#.##..###.###
+.#.#....#.##.#...###.##.
+###.#...#..#.##.######..
+.#.#.###.##.##.#..#.##..
+.####.###.#...###.#..#.#
+..#.#..#..#.#.#.####.###
+#..####...#.#.#.###.###.
+#####..#####...###....##
+#.##..#..#...#..####...#
+.#.###..##..##..####.##.
+...###...##...#...#..###")
+
+(some? (some #{".#.#..#.##...#.##..#####
+###....#.#....#..#......
+##.##.###.#.#..######...
+###.#####...#.#####.#..#
+##.#....#.##.####...#.##
+...########.#....#####.#
+....#..#...##..#.#.###..
+.####...#..#.....#......
+#..#.##..#..###.#.##....
+#.####..#.####.#.#.###..
+###.#.#...#.######.#..##
+#.####....##..########.#
+##..##.#...#...#.#.#.#..
+...#..#..#.#.##..###.###
+.#.#....#.##.#...###.##.
+###.#...#..#.##.######..
+.#.#.###.##.##.#..#.##..
+.####.###.#...###.#..#.#
+..#.#..#..#.#.#.####.###
+#..####...#.#.#.###.###.
+#####..#####...###....##
+#.##..#..#...#..####...#
+.#.###..##..##..####.##.
+...###...##...#...#..###"} (all-images test-tiles)))
