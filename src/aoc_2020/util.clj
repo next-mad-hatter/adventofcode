@@ -31,3 +31,10 @@
 (defn spy
   ([val] (spy "DBG:" val))
   ([msg val] (print msg " ") (pp/pprint val) val))
+
+(defn re-pos [re s]
+  (loop [m (re-matcher re s)
+         res {}]
+    (if (.find m)
+      (recur m (assoc res (.start m) (.group m)))
+      res)))
