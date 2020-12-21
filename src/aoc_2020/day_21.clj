@@ -24,23 +24,16 @@
       (empty? inclusions) dictionary
       :else
       (let [singletons   (filter (comp #(= (count %) 1) second) inclusions)
-            new-dict     (map (juxt first (comp first second)) singletons)
-            dictionary'  (into dictionary new-dict)
-            inclusions'  (apply dissoc inclusions (map first new-dict))
-            inclusions'' (fmap #(apply disj % (map second new-dict)) inclusions')]
+            new-pairs    (map (juxt first (comp first second)) singletons)
+            dictionary'  (into dictionary new-pairs)
+            inclusions'  (apply dissoc inclusions (map first new-pairs))
+            inclusions'' (fmap #(apply disj % (map second new-pairs)) inclusions')]
         (recur dictionary' inclusions'')))))
 
 (defn solve-part-1 [input]
-  (let [translated (set (vals (translate (input->inclusions input))))
+  (let [translated (-> input input->inclusions translate vals set)
         words      (mapcat second input)]
     (count (remove translated words))))
-
-(def input
-  (->> "2020/day_21_input.txt"
-       read-input))
-
-(solve-part-1 input)
-;; => 2542
 
 (defn solve-part-2 [input]
   (->> input
@@ -49,6 +42,13 @@
        sort
        (map second)
        (str/join ",")))
+
+(def input
+  (->> "2020/day_21_input.txt"
+       read-input))
+
+(solve-part-1 input)
+;; => 2542
 
 (solve-part-2 input)
 ;; => "hkflr,ctmcqjf,bfrq,srxphcm,snmxl,zvx,bd,mqvk"
