@@ -9,6 +9,7 @@
         instaparse/instaparse           {:mvn/version "1.4.10"}
         org.clojure/core.match          {:mvn/version "1.0.0"}
         net.mikera/core.matrix          {:mvn/version "0.62.0"}
+        org.clojure/data.finger-tree    {:mvn/version "0.0.3"}
         ;; org.clojure/core.logic         {:mvn/version "1.0.0"}
         ;; org.clojure/data.csv           {:mvn/version "1.0.0"}
         ;; org.clojure/data.json          {:mvn/version "1.0.0"}

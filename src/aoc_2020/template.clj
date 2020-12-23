@@ -11,7 +11,8 @@
    #_[clojure.math.combinatorics :as combo]
    #_[ubergraph.core :as uber]
    #_[ubergraph.alg :as ga :refer [topsort]]
-   #_[clojure.zip :as zip]))
+   #_[clojure.zip :as zip]
+   #_[taoensso.tufte :as tufte :refer [p profile]]))
 
 ;; TODO: check out kibit
 
@@ -25,3 +26,9 @@
 
 (t/deftest whooot
   (t/is (= 1 1)))
+
+(comment
+  (time
+   (profile
+    {}
+    (get [1] 0))))
