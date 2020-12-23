@@ -1,8 +1,7 @@
 (ns aoc-2020.day-23
   (:require [clojure.edn :as edn]
             [clojure.string :as str]
-            [clojure.core.rrb-vector :as fv]
-            [aoc-2020.util :as util]))
+            #_[clojure.core.rrb-vector :as fv]))
 
 (defn read-input [s]
   (as-> s $
@@ -33,7 +32,7 @@
     (into
      ;; we don't want to deal with 0-based lookup right now
      (vector-of :int 42)
-     ;; FIXME: rrb vector breaks, see below
+     ;; Note: rrb vector might be broken with jdk 11 and clojure 1.10.1
      ;; (fv/vector-of :int 42)
      (map second
           (sort-by first
@@ -50,12 +49,11 @@
         ;; NB: this assumes one-padded vector lookup
         l (decrease x (dec (count lut)) #{a b c})
         r (lut l)
-        ;; NB: l might be equal to y, r -- to x, hence the reduction
         ops [#(assoc % x y)
              #(assoc % c r)
              #(assoc % l a)]
-        ;; FIXME: with rrb vector and padding >= 32, the application fails here
-        ;; _ (util/spy "R" (reductions #(%2 %1) lut (rest ops)))
+        ;; Note: with rrb vector and padding >= 32, the application fails here,
+        ;;       but it's unclear why/how exactly and seems weirdly hard to reproduce
         lut' ((apply comp ops) lut)]
     [(lut' head) lut']))
 
@@ -89,9 +87,6 @@
 (time
  (run 9 output-1 100 "974618352"))
 ;; => "175893264"
-
-;; FIXME: this suddenly breaks for padding >= 32 when using rrb's vector-of
-;; (run 32 output-2 2 "389125467")
 
 (time
   (def part-2-test
