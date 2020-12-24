@@ -1,7 +1,6 @@
 (ns aoc-2020.day-23
   (:require [clojure.edn :as edn]
-            [clojure.string :as str]
-            #_[clojure.core.rrb-vector :as fv]))
+            [clojure.string :as str]))
 
 (defn read-input [s]
   (as-> s $
@@ -28,8 +27,8 @@
   [head input]
   (let [n (count input)]
     (into
-     ;; Note: rrb vector might be broken with jdk 11 and clojure 1.10.1
-     (vector-of :int head)
+     ;; (vector-of :int head)
+     (vector head)
      (map second
           (sort-by first
                    (for [i (range n)]
@@ -37,21 +36,19 @@
                        (mapv input (vector i i+)))))))))
 
 (defn step [lut]
-  (let [x (lut 0)
+  (let [lut (transient lut)
+        x (lut 0)
         a (lut x)
         b (lut a)
         c (lut b)
         y (lut c)
         l (decrease x (dec (count lut)) #{a b c})
         r (lut l)
-        ops [#(assoc % x y)
-             #(assoc % c r)
-             #(assoc % l a)]
-        ;; Note: with rrb vector and padding >= 32, the application fails here,
-        ;;       but it's unclear to me why/how exactly and it seems weirdly hard to reproduce
-        lut'  ((apply comp ops) lut)
-        head' (lut' x)]
-    (assoc lut' 0 head')))
+        lut'   (assoc! lut x y)
+        lut''  (assoc! lut' c r)
+        lut''' (assoc! lut'' l a)
+        res    (assoc! lut''' 0 y)]
+    (persistent! res)))
 
 (defn output-1 [lut]
   (let [iters (iterate #(lut %) 1)
