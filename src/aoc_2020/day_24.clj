@@ -18,10 +18,6 @@
 (defn neighbours [t]
   (map (partial add-tiles t) (vals directions)))
 
-(add-tiles [1 3] [3 5])
-
-(neighbours [3 5])
-
 (defn read-input [filename]
   (->> filename
        util/fetch-lines
@@ -57,16 +53,15 @@
        count))
 
 (defn step [blacks]
-  (let [whites     (set/difference
-                (set (mapcat neighbours blacks))
-                blacks)
+  (let [whites     (set/difference (set (mapcat neighbours blacks))
+                                   blacks)
         new-blacks (set (filter #(= 2 (hood-cnt blacks %)) whites))
         new-whites (set (filter #((complement #{1 2}) (hood-cnt blacks %)) blacks))]
     (set/union new-blacks (set/difference blacks new-whites))))
 
 (defn solve-part-2 [blacks n]
   (let [iters (iterate step blacks)
-        res (nth iters n)]
+        res   (nth iters n)]
     (count res)))
 
 (defn part-2 [filename]
