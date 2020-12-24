@@ -14,6 +14,8 @@
    #_[clojure.zip :as zip]
    #_[taoensso.tufte :as tufte :refer [p profile]]))
 
+#_(set! *warn-on-reflection* true)
+
 ;; TODO: check out kibit
 
 (util/fetch-whole "2020/day_01_test.txt")
@@ -26,6 +28,8 @@
 
 (t/deftest whooot
   (t/is (= 1 1)))
+
+(tufte/add-basic-println-handler! {})
 
 (comment
   (time
