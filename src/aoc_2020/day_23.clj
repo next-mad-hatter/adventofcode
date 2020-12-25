@@ -6,7 +6,7 @@
   (as-> s $
     (str/split $ #"")
     (map edn/read-string $)
-    (apply vector-of :int $)))
+    (apply vector $)))
 
 (defn decrease [e m not-es]
   (loop [e e
@@ -20,14 +20,13 @@
 (defn pad-input [input len]
   (let [m (apply max input)]
     ;; TODO: assert that input contains elements 1..m with m > 8
-    (into input (apply vector-of :int (range (inc m) (inc len))))))
+    (into input (apply vector (range (inc m) (inc len))))))
 
 (defn initialize-lut
   "Creates lookup vector: val -> next-val"
   [head input]
   (let [n (count input)]
     (into
-     ;; (vector-of :int head)
      (vector head)
      (map second
           (sort-by first
@@ -36,8 +35,7 @@
                        (mapv input (vector i i+)))))))))
 
 (defn step [lut]
-  (let [lut (transient lut)
-        x (lut 0)
+  (let [x (lut 0)
         a (lut x)
         b (lut a)
         c (lut b)
@@ -48,7 +46,7 @@
         lut''  (assoc! lut' c r)
         lut''' (assoc! lut'' l a)
         res    (assoc! lut''' 0 y)]
-    (persistent! res)))
+    res))
 
 (defn output-1 [lut]
   (let [iters (iterate #(lut %) 1)
@@ -64,8 +62,8 @@
   (let [ds    (read-input input)
         head  (first ds)
         lut   (initialize-lut head (pad-input ds padding))
-        iters (iterate step lut)
-        res   (nth iters n)]
+        iters (iterate step (transient lut))
+        res   (persistent! (nth iters n))]
     (formatter res)))
 
 (def part-1 (partial run 9 output-1))
@@ -87,8 +85,7 @@
 part-2-test
 ;; => [934001 159792]
 
-(time
- (apply * part-2-test))
+(apply * part-2-test)
 ;; => 149245887792
 
 (time
@@ -98,7 +95,6 @@ part-2-test
 part-2-answer
 ;; => [422812 90259]
 
-(time
- (apply * part-2-answer))
+(apply * part-2-answer)
 ;; => 38162588308
 
