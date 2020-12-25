@@ -1,4 +1,4 @@
-(ns aoc-2020.day-19
+(ns aoc-2020.day-24
   (:require [aoc-2020.util :as util]
             [clojure.set :as set]))
 
