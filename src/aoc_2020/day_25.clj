@@ -1,6 +1,8 @@
 (ns aoc-2020.day-25
   (:require [clojure.set :as set]))
 
+(set! *unchecked-math* true)
+
 (defn mod-pow [b e m]
   (int
    (.modPow (BigInteger/valueOf b)
