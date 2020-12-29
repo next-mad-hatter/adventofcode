@@ -1,8 +1,7 @@
 (ns aoc-2020.day-11
   (:require [aoc-2020.util :as util]
-            [clojure.algo.generic.functor :as gf]
-            [clojure.string :as str]
-            [taoensso.tufte :as tufte :refer [p profile]]))
+            [clojure.algo.generic.functor :refer [fmap]]
+            [clojure.string :as str]))
 
 (defn lines->seats [lines]
   (let [input (into {} (for [x     (range (count lines))
@@ -22,15 +21,17 @@
        lines->seats))
 
 (defn change-state-of [thresh hood state coor s]
-  (let [cnt (count (filter true? (map state (hood coor))))]
+  (let [cnt (reduce + 0 (map state (hood coor)))]
     (when (or
-           (and (not s) (= cnt 0))
-           (and s (>= cnt thresh))) coor)))
+           (and (= 0 s) (= cnt 0))
+           (and (= 1 s) (>= cnt thresh))) [coor (bit-xor 1 s)])))
 
 (defn step [hood thresh state]
-  (let [inds   (keep-indexed (partial change-state-of thresh hood state) state)
-        state' (reduce (fn [st i] (assoc st i (not (st i)))) state inds)]
-    state'))
+  (p ::step
+     (let [inds   (keep-indexed (partial change-state-of thresh hood state) state)
+           state  (transient state)
+           state' (reduce (fn [st [i v]] (assoc! st i v)) state inds)]
+       (persistent! state'))))
 
 (defn find-fixed-point [xs]
   (->> xs
@@ -47,16 +48,12 @@
         tr    (enumerate (start :seats))
         hood  (into {} (mapv (fn [[k v]] [(tr k) (filter some? (mapv tr v))]) hood))
         hood  (mapv (comp seq second) (sort-by first (into [] hood)))
-        ;; TODO: try this
-        ;; state (into (vector-of :int) (repeat (count hood) false))
-        state (vec (repeat (count hood) false))
-        ]
+        state (vec (repeat (count hood) 0))]
     (->> state
          (iterate (partial step hood thresh))
-         (take 10000)
+         (take 100000)
          find-fixed-point
-         (filter true?)
-         count)))
+         (reduce + 0))))
 
 ;;
 ;; Part 1
@@ -72,7 +69,7 @@
   (let [mx  (apply max (map first seats))
         my  (apply max (map last seats))
         all (into {} (map (fn [coors] [coors (set (map #(mapv + coors %) eight-dirs))]) seats))]
-    (gf/fmap #(set (filter (fn [[x y]] (and (<= 0 x mx) (<= 0 y my))) %)) all)))
+    (fmap #(set (filter (fn [[x y]] (and (<= 0 x mx) (<= 0 y my))) %)) all)))
 
 (defn part-1 [filename]
   (solve construct-hood-1 4 filename))
@@ -114,27 +111,3 @@
 (time (part-2 "2020/day_11_input.txt"))
 ;; => 2121
 
-;;
-;; Until we're done tinkering, we'll leave this here
-;;
-
-(tufte/add-basic-println-handler! {})
-
-(comment)
-(time
- (profile
-  {}
-  (let [start  (init "2020/day_11_input.txt")
-        hood   (construct-hood-2 (start :seats))
-        thresh 5
-        tr     (enumerate (start :seats))
-        hood   (p ::h0 (into {} (mapv (fn [[k v]] [(tr k) (filter some? (mapv tr v))]) hood)))
-        hood   (p ::h1 (mapv (comp seq second) (sort-by first (into [] hood))))
-        state  (vec (repeat (count hood) false))]
-    (->> state
-         (iterate (partial step hood thresh))
-         (take 100)
-         (doall)
-         last
-         (filter true?)
-         count))))
