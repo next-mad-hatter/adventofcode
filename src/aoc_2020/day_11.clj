@@ -21,16 +21,16 @@
        (mapv #(str/split % #""))
        lines->seats))
 
-(defn new-state-of [thresh hood state coor s]
+(defn change-state-of [thresh hood state coor s]
   (let [cnt (count (filter true? (map state (hood coor))))]
-    (cond
-      (and (not s) (= cnt 0)) true
-      (and s (>= cnt thresh)) false
-      :else                   s)))
+    (when (or
+           (and (not s) (= cnt 0))
+           (and s (>= cnt thresh))) coor)))
 
 (defn step [hood thresh state]
-  (p ::step (into (vector-of :boolean)
-                  (map-indexed (partial new-state-of thresh hood state) state))))
+  (let [inds   (keep-indexed (partial change-state-of thresh hood state) state)
+        state' (reduce (fn [st i] (assoc st i (not (st i)))) state inds)]
+    state'))
 
 (defn find-fixed-point [xs]
   (->> xs
@@ -47,11 +47,13 @@
         tr    (enumerate (start :seats))
         hood  (into {} (mapv (fn [[k v]] [(tr k) (filter some? (mapv tr v))]) hood))
         hood  (mapv (comp seq second) (sort-by first (into [] hood)))
-        state (into (vector-of :boolean) (repeat (count hood) false))]
+        ;; TODO: try this
+        ;; state (into (vector-of :int) (repeat (count hood) false))
+        state (vec (repeat (count hood) false))
+        ]
     (->> state
          (iterate (partial step hood thresh))
          (take 10000)
-         ;; (map #(util/spy "STATE" %))
          find-fixed-point
          (filter true?)
          count)))
@@ -81,7 +83,6 @@
 (time (part-1 "2020/day_11_test.txt"))
 ;; => 37
 
-;; Takes appr. 1.1 sec w/ i5-7200U or ? secs w/ i5-8265U
 (time (part-1 "2020/day_11_input.txt"))
 ;; => 2275
 
@@ -110,7 +111,6 @@
 (time (part-2 "2020/day_11_test.txt"))
 ;; => 26
 
-;; Takes appr. 1.1 secs w/ i5-7200U or ? secs w/ i5-8265U
 (time (part-2 "2020/day_11_input.txt"))
 ;; => 2121
 
@@ -128,9 +128,9 @@
         hood   (construct-hood-2 (start :seats))
         thresh 5
         tr     (enumerate (start :seats))
-        hood   (into {} (mapv (fn [[k v]] [(tr k) (filter some? (mapv tr v))]) hood))
-        hood   (mapv (comp seq second) (sort-by first (into [] hood)))
-        state  (into (vector-of :boolean) (repeat (count hood) false))]
+        hood   (p ::h0 (into {} (mapv (fn [[k v]] [(tr k) (filter some? (mapv tr v))]) hood)))
+        hood   (p ::h1 (mapv (comp seq second) (sort-by first (into [] hood))))
+        state  (vec (repeat (count hood) false))]
     (->> state
          (iterate (partial step hood thresh))
          (take 100)
