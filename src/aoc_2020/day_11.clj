@@ -5,14 +5,14 @@
             [taoensso.tufte :as tufte :refer [p profile]]))
 
 (defn lines->seats [lines]
-  (let [input (into {} (for [x (range (count lines))
-                             y (range (count (first lines)))
-                             :let [s (get-in lines [x y])]
+  (let [input (into {} (for [x     (range (count lines))
+                             y     (range (count (first lines)))
+                             :let  [s (get-in lines [x y])]
                              :when (#{"L" "#"} s)]
                          [[x y] ({"L" false "#" true} s)]))
         seats (keys input)
-        occ (set (map first (filter (fn [[_ v]] true? v) input)))]
-    {:seats seats
+        occ   (set (map first (filter (fn [[_ v]] true? v) input)))]
+    {:seats    seats
      :occupied (if (empty? occ) occ (throw (Exception. "Not implemented")))}))
 
 (defn init [filename]
@@ -21,22 +21,16 @@
        (mapv #(str/split % #""))
        lines->seats))
 
-(defn new-state-of [thresh coor cnt s]
-  (cond
-    (and (not s) (= cnt 0)) [coor true]
-    (and s (>= cnt thresh)) [coor false]
-    :else nil))
+(defn new-state-of [thresh hood state coor s]
+  (let [cnt (count (filter true? (map state (hood coor))))]
+    (cond
+      (and (not s) (= cnt 0)) true
+      (and s (>= cnt thresh)) false
+      :else                   s)))
 
 (defn step [hood thresh state]
-  (let [occupied      (state :occupied)
-        occ-neigh-cnt (state :occ-neigh-cnt)
-        flips         (p ::flips (vec (filter some? (map (partial new-state-of thresh) (range) occ-neigh-cnt occupied))))
-        next-occ      (p ::next-occ (reduce (fn [o [k v]] (assoc o k v)) occupied flips))
-        cnt-groups    (p ::cnt-groups (group-by second (filter (comp some? hood first) flips)))
-        cnt-items     (p ::cnt-items (gf/fmap #(mapcat (comp hood first) %) cnt-groups))
-        next-cnt      (p ::next-cnt+ (reduce (fn [c k] (update c k inc)) occ-neigh-cnt (cnt-items true {})))
-        next-cnt      (p ::next-cnt- (reduce (fn [c k] (update c k dec)) next-cnt (cnt-items false {})))]
-    {:occupied next-occ, :occ-neigh-cnt next-cnt}))
+  (p ::step (into (vector-of :boolean)
+                  (map-indexed (partial new-state-of thresh hood state) state))))
 
 (defn find-fixed-point [xs]
   (->> xs
@@ -49,16 +43,15 @@
 
 (defn solve [construct-hood thresh filename]
   (let [start (init filename)
-        hood (construct-hood (start :seats))
-        tr (enumerate (start :seats))
-        hood (into {} (mapv (fn [[k v]] [(tr k) (filter some? (mapv tr v))]) hood))
-        hood (mapv second (sort-by first (into [] hood)))
-        occupied (vec (repeat (count hood) false))
-        occ-neigh-cnt (vec (repeat (count hood) 0))]
-    (->> {:occupied occupied, :occ-neigh-cnt occ-neigh-cnt}
+        hood  (construct-hood (start :seats))
+        tr    (enumerate (start :seats))
+        hood  (into {} (mapv (fn [[k v]] [(tr k) (filter some? (mapv tr v))]) hood))
+        hood  (mapv (comp seq second) (sort-by first (into [] hood)))
+        state (into (vector-of :boolean) (repeat (count hood) false))]
+    (->> state
          (iterate (partial step hood thresh))
-         (take 100000)
-         (map :occupied)
+         (take 10000)
+         ;; (map #(util/spy "STATE" %))
          find-fixed-point
          (filter true?)
          count)))
@@ -68,30 +61,28 @@
 ;;
 
 (def eight-dirs
-  (for [x [-1 0 1]
-        y [-1 0 1]
+  (for [x     [-1 0 1]
+        y     [-1 0 1]
         :when (not= [x y] [0 0])]
     [x y]))
 
 (defn construct-hood-1 [seats]
-  (let [mx (apply max (map first seats))
-        my (apply max (map last seats))
+  (let [mx  (apply max (map first seats))
+        my  (apply max (map last seats))
         all (into {} (map (fn [coors] [coors (set (map #(mapv + coors %) eight-dirs))]) seats))]
     (gf/fmap #(set (filter (fn [[x y]] (and (<= 0 x mx) (<= 0 y my))) %)) all)))
 
 (defn part-1 [filename]
   (solve construct-hood-1 4 filename))
 
-(comment
-  (time (part-1 "2020/day_11_small.txt")))
+(time (part-1 "2020/day_11_small.txt"))
 ;; => 6
 
 (time (part-1 "2020/day_11_test.txt"))
 ;; => 37
 
-;; Takes appr. 1.5 sec w/ i5-7200U or ? secs w/ i5-8265U
-(comment
-  (time (part-1 "2020/day_11_input.txt")))
+;; Takes appr. 1.1 sec w/ i5-7200U or ? secs w/ i5-8265U
+(time (part-1 "2020/day_11_input.txt"))
 ;; => 2275
 
 ;;
@@ -99,9 +90,9 @@
 ;;
 
 (defn construct-hood-2 [seats]
-  (let [seats     (set seats)
-        mx        (apply max (map first seats))
-        my        (apply max (map last seats))
+  (let [seats (set seats)
+        mx    (apply max (map first seats))
+        my    (apply max (map last seats))
 
         move      (fn [dir] (fn [from] (mapv + from dir)))
         ray       (fn [from dir] (rest (iterate (move dir) from)))
@@ -110,7 +101,7 @@
                                   (contains? seats [x y])))
         neighbour (fn [coors dir] (util/find-first stop-at (ray coors dir)))
 
-        looks-at  (fn [coors] (set (filter some? (map #(->> % (neighbour coors) seats) eight-dirs))))]
+        looks-at (fn [coors] (set (filter some? (map #(->> % (neighbour coors) seats) eight-dirs))))]
     (into {} (map (fn [k] [k (looks-at k)]) seats))))
 
 (defn part-2 [filename]
@@ -119,9 +110,8 @@
 (time (part-2 "2020/day_11_test.txt"))
 ;; => 26
 
-;; Takes appr. 1.5 secs w/ i5-7200U or 1.3 secs w/ i5-8265U
-(comment
-  (time (part-2 "2020/day_11_input.txt")))
+;; Takes appr. 1.1 secs w/ i5-7200U or ? secs w/ i5-8265U
+(time (part-2 "2020/day_11_input.txt"))
 ;; => 2121
 
 ;;
@@ -130,22 +120,21 @@
 
 (tufte/add-basic-println-handler! {})
 
-(comment
-  (time
-   (profile
-    {}
-    (ffirst
-     (mapv identity
-           (let [start (init "2020/day_11_input.txt")
-                 hood (construct-hood-2 (start :seats))
-                 thresh 5
-                 tr (enumerate (start :seats))
-                 hood (into {} (mapv (fn [[k v]] [(tr k) (filter some? (mapv tr v))]) hood))
-                 hood (mapv second (sort-by first (into [] hood)))
-                 occupied (vec (repeat (count hood) false))
-                 occ-neigh-cnt (vec (repeat (count hood) 0))]
-             (->> {:occupied occupied, :occ-neigh-cnt occ-neigh-cnt}
-                  (iterate (partial step hood thresh))
-                  (take 30)
-                  (doall)
-                  first)))))))
+(comment)
+(time
+ (profile
+  {}
+  (let [start  (init "2020/day_11_input.txt")
+        hood   (construct-hood-2 (start :seats))
+        thresh 5
+        tr     (enumerate (start :seats))
+        hood   (into {} (mapv (fn [[k v]] [(tr k) (filter some? (mapv tr v))]) hood))
+        hood   (mapv (comp seq second) (sort-by first (into [] hood)))
+        state  (into (vector-of :boolean) (repeat (count hood) false))]
+    (->> state
+         (iterate (partial step hood thresh))
+         (take 100)
+         (doall)
+         last
+         (filter true?)
+         count))))
