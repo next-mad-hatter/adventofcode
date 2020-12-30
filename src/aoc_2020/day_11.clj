@@ -26,9 +26,9 @@
            (and (= 1 s) (>= cnt thresh))) [coor (bit-xor 1 s)])))
 
 (defn step [hood thresh state]
-  (let [inds   (keep-indexed (partial change-state-of thresh hood state) state)
-        state  (transient state)
-        state' (reduce (fn [st [i v]] (assoc! st i v)) state inds)]
+  (let [changes (keep-indexed (partial change-state-of thresh hood state) state)
+        state   (transient state)
+        state'  (reduce (fn [st [i v]] (assoc! st i v)) state changes)]
     (persistent! state')))
 
 (defn find-fixed-point [xs]
@@ -41,12 +41,14 @@
   (into {} (mapv (comp (partial apply vector) rseq) (map-indexed vector xs))))
 
 (defn solve [construct-hood thresh filename]
-  (let [start (init filename)
-        hood  (construct-hood (start :seats))
-        tr    (enumerate (start :seats))
-        hood  (map (fn [[k v]] [(tr k) (filter some? (mapv tr v))]) hood)
-        hood  (mapv (comp seq second) (sort-by first hood))
-        state (vec (repeat (count hood) 0))]
+  (let [seats (:seats (init filename))
+        tr    (enumerate seats)
+        hood  (->> seats
+                   construct-hood
+                   (map (fn [[k v]] [(tr k) (filter some? (mapv tr v))]))
+                   (sort-by first)
+                   (mapv (comp seq second)))
+        state (vec (repeat (count seats) 0))]
     (->> state
          (iterate (partial step hood thresh))
          (take 100000)
