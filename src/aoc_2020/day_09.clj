@@ -1,7 +1,6 @@
 (ns aoc-2020.day-09
-  (:require
-   [aoc-2020.util :as util]
-   [clojure.math.combinatorics :as combo]))
+  (:require [aoc-2020.util :as util]
+            [clojure.math.combinatorics :as combo]))
 
 ;; (def input-file "2020/day_09_test.txt")
 ;; (def cont-length 5)
@@ -38,28 +37,29 @@ answer-1
 ;;  Part 2
 
 (defn pos-yields-sum [nums pos sum]
-  (loop [pos pos
-         sum sum
+  (loop [pos   pos
+         sum   sum
          l-min nil
          l-max nil]
     (let [x (get nums pos)]
       (cond
-        (nil? x) nil
-        (> x sum) nil
+        (nil? x)                     nil
+        (> x sum)                    nil
         (and (= x sum) (nil? l-min)) nil
-        (= x sum) [l-min l-max]
-        :else (recur
-               (inc pos)
-               (- sum x)
-               (apply min (remove nil? [l-min x]))
-               (apply max (remove nil? [l-max x])))))))
+        (= x sum)                    [l-min l-max]
+        :else
+        (recur
+         (inc pos)
+         (- sum x)
+         (apply min (remove nil? [l-min x]))
+         (apply max (remove nil? [l-max x])))))))
 
 (defn scan-chunk [nums target]
-   (->> nums
-        count
-        range
-        (map #(pos-yields-sum nums % target))
-        (find-first some?)))
+  (->> nums
+       count
+       range
+       (map #(pos-yields-sum nums % target))
+       (find-first some?)))
 
 (time
  (def answer-2

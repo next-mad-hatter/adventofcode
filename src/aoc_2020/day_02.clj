@@ -1,7 +1,6 @@
 (ns aoc-2020.day-02
-  (:require
-   [aoc-2020.util :as util]
-   [clojure.algo.generic.functor :as gf :refer [fmap]]))
+  (:require [aoc-2020.util :as util]
+            [clojure.algo.generic.functor :as gf :refer [fmap]]))
 
 (defn match->entry [matches]
   (gf/fmap #(nth matches %) {:min 1 :max 2 :char 3 :pw 4}))

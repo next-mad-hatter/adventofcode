@@ -1,6 +1,5 @@
 (ns aoc-2020.day-10
-  (:require
-   [aoc-2020.util :as util]))
+  (:require [aoc-2020.util :as util]))
 
 ;; Part 1
 
@@ -18,7 +17,7 @@
             (recur path vertices)))))))
 
 (defn solve-with [init solver input]
-  (let [sink (+ 3 (apply max input))
+  (let [sink     (+ 3 (apply max input))
         adaptors (set input)]
     (if (not= (count input) (count adaptors))
       (throw (Exception. "Not implemented"))
@@ -39,7 +38,7 @@
        ["2020/day_10_test_1.txt" "2020/day_10_test_2.txt" "2020/day_10_input.txt"]))
 
 (time
-  (part-1))
+ (part-1))
 ;; => (35 220 2030)
 
 ;;  Part 2
@@ -52,12 +51,11 @@
        (let [candidates (filter #(<= (- % 3) src %) vertices)
              subpaths   (map (fn [v] (filter #(> % v) vertices)) candidates)
              solutions  (map path-counter candidates subpaths)]
-          (apply + solutions))))))
+         (apply + solutions))))))
 
 (defn part-2 []
-  (time
-   (map #(->> % util/fetch-numbers (solve-with 0 path-counter))
-        ["2020/day_10_test_1.txt" "2020/day_10_test_2.txt" "2020/day_10_input.txt"])))
+  (map #(->> % util/fetch-numbers (solve-with 0 path-counter))
+       ["2020/day_10_test_1.txt" "2020/day_10_test_2.txt" "2020/day_10_input.txt"]))
 
 (time
  (part-2))

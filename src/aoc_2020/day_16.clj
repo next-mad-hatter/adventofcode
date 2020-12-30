@@ -1,10 +1,9 @@
 (ns aoc-2020.day-16
-  (:require
-   [aoc-2020.util :as util]
-   [clojure.string :as str]
-   [clojure.edn :as edn]
-   [clojure.algo.generic.functor :refer [fmap]]
-   [clojure.set :as set]))
+  (:require [aoc-2020.util :as util]
+            [clojure.string :as str]
+            [clojure.edn :as edn]
+            [clojure.algo.generic.functor :refer [fmap]]
+            [clojure.set :as set]))
 
 (defn parse-domain [r]
   (let [ms (rest (re-matches #"(.+)\s*:\s+(\d+)\s*-\s*(\d+)\s+or\s+(\d+)\s*-\s*(\d+)" r))]
@@ -58,16 +57,16 @@
 
 (defn translate [possible]
   (loop [dictionary {}
-         possible possible]
+         possible   possible]
     (cond
       (some (comp empty? second) possible) nil
-      (empty? possible) (set/map-invert dictionary)
+      (empty? possible)                    (set/map-invert dictionary)
       :else
-      (let [singletons   (filter (comp #(= (count %) 1) second) possible)
-            new-pairs    (map (juxt first (comp first second)) singletons)
-            dictionary'  (into dictionary new-pairs)
-            possible'  (apply dissoc possible (map first new-pairs))
-            possible'' (fmap #(apply disj % (map second new-pairs)) possible')]
+      (let [singletons  (filter (comp #(= (count %) 1) second) possible)
+            new-pairs   (map (juxt first (comp first second)) singletons)
+            dictionary' (into dictionary new-pairs)
+            possible'   (apply dissoc possible (map first new-pairs))
+            possible''  (fmap #(apply disj % (map second new-pairs)) possible')]
         (recur dictionary' possible'')))))
 
 (defn solve [input]

@@ -2,6 +2,8 @@
   (:require [clojure.edn :as edn]
             [clojure.string :as str]))
 
+;; FIXME: Can we improve speed without resorting to mutable arrays?
+
 (defn read-input [s]
   (as-> s $
     (str/split $ #"")
@@ -9,7 +11,7 @@
     (apply vector $)))
 
 (defn decrease [e m not-es]
-  (loop [e e
+  (loop [e   e
          cnt 0]
     (if (> cnt 42)
       nil
@@ -35,13 +37,13 @@
                        (mapv input (vector i i+)))))))))
 
 (defn step [lut]
-  (let [x (lut 0)
-        a (lut x)
-        b (lut a)
-        c (lut b)
-        y (lut c)
-        l (decrease x (dec (count lut)) #{a b c})
-        r (lut l)
+  (let [x      (lut 0)
+        a      (lut x)
+        b      (lut a)
+        c      (lut b)
+        y      (lut c)
+        l      (decrease x (dec (count lut)) #{a b c})
+        r      (lut l)
         lut'   (assoc! lut x y)
         lut''  (assoc! lut' c r)
         lut''' (assoc! lut'' l a)
@@ -79,8 +81,8 @@
 ;; => "175893264"
 
 (time
-  (def part-2-test
-    (part-2 10000000 "389125467")))
+ (def part-2-test
+   (part-2 10000000 "389125467")))
 
 part-2-test
 ;; => [934001 159792]

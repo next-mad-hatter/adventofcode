@@ -1,9 +1,7 @@
 (ns aoc-2020.day-18
-  (:require
-   [aoc-2020.util :as util]
-   [instaparse.core :as insta]
-   [clojure.edn :as edn]
-   [clojure.test :as t]))
+  (:require [aoc-2020.util :as util]
+            [instaparse.core :as insta]
+            [clojure.edn :as edn]))
 
 (def eval-tree
   (partial

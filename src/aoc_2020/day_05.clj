@@ -1,7 +1,5 @@
 (ns aoc-2020.day-05
-  (:require
-   [aoc-2020.util :as util]
-   [clojure.string :as str]))
+  (:require [aoc-2020.util :as util]))
 
 ;;
 ;; Another possibility for decoding:
@@ -34,14 +32,15 @@ part-1-answer ;; => 959
 (defn zip [& colls]
   (partition (count colls) (apply interleave colls)))
 
-(def part-2-answer
-  (apply #(+ (* 8 %1) %2)
-         (first
-          (for [x (range 256)
-                y (range 8)
-                :when (not (contains? nums [x y]))
-                :when (contains? nums [(dec x) y])
-                :when (contains? nums [(inc x) y])]
-            [x y]))))
+(time
+ (def part-2-answer
+   (apply #(+ (* 8 %1) %2)
+          (first
+           (for [x     (range 256)
+                 y     (range 8)
+                 :when (not (contains? nums [x y]))
+                 :when (contains? nums [(dec x) y])
+                 :when (contains? nums [(inc x) y])]
+             [x y])))))
 
 part-2-answer ;; => 527

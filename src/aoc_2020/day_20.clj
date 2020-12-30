@@ -10,8 +10,8 @@
 
 (defn read-tile-bits [input]
   (as-> input $
-      (str/split $ #"\R")
-      (mapv (partial mapv {\# 1 \. 0}) $)))
+    (str/split $ #"\R")
+    (mapv (partial mapv {\# 1 \. 0}) $)))
 
 (defn read-tiles [filename]
   (->> filename
@@ -33,7 +33,7 @@
 (def actions
   "All elements of D_4 as actions on a tile"
   (let [rotations [identity rot (comp rot rot) (comp rot rot rot)]
-        flipped (mapv #(comp flip %) rotations)]
+        flipped   (mapv #(comp flip %) rotations)]
     (vec (concat rotations flipped))))
 
 (def sym-count (count actions))
@@ -86,51 +86,51 @@
     (some-and-not= (get-border (solution [x (dec y)]) 2) (get-border [t o] 0)) false
     (some-and-not= (get-border (solution [(inc x) y]) 3) (get-border [t o] 1)) false
     (some-and-not= (get-border (solution [x (inc y)]) 0) (get-border [t o] 2)) false
-    :else true))
+    :else                                                                      true))
 
 (defn feasible-for
   "Given a partial solution, enumerates all feasible solutions for grid cell [x y]"
   [sym-count get-border tile-lut free-tiles solution [x y]]
   (let [neighbourders (set (filter some? (map (fn [[x y z]] (get-border (solution [x y]) z))
                                               [[(dec x) y 1] [x (dec y) 2] [(inc x) y 3] [x (inc y) 0]])))
-        looked-up (set (mapcat tile-lut neighbourders))
+        looked-up     (set (mapcat tile-lut neighbourders))
         ;; In our input, all possible borders are only present once or twice,
         ;; hence we want to go through them in order to arrive at a feasible execution time.
-        _ (assert (or (empty? solution) (not-empty looked-up)) (str solution " " [x y]))
-        constrained (if (empty? looked-up)
+        _             (assert (or (empty? solution) (not-empty looked-up)) (str solution " " [x y]))
+        constrained   (if (empty? looked-up)
                       free-tiles
                       (set/intersection free-tiles looked-up))]
-    (for [t constrained
-          o (range sym-count)
+    (for [t     constrained
+          o     (range sym-count)
           :when (aligns get-border solution [x y] [t o])]
       [t o])))
 
 (defn find-solution [sym-count get-border tile-lut free-cells free-tiles solution]
   (if (empty? free-cells)
     solution
-    (let [[x y] (first free-cells)
-          feasible (feasible-for sym-count get-border tile-lut free-tiles solution [x y])
+    (let [[x y]       (first free-cells)
+          feasible    (feasible-for sym-count get-border tile-lut free-tiles solution [x y])
           free-cells' (rest free-cells)
-          find-sub (partial find-solution sym-count get-border tile-lut free-cells')
+          find-sub    (partial find-solution sym-count get-border tile-lut free-cells')
           subproblems (mapv (fn [[t o]] [(disj free-tiles t) (assoc solution [x y] [t o])]) feasible)
-          result (util/find-first some? (map (partial apply find-sub) subproblems))]
+          result      (util/find-first some? (map (partial apply find-sub) subproblems))]
       result)))
 
 (defn solve-part-1 [filename]
-  (let [tiles (read-tiles filename)
-        boundary-lut (make-boundary-lut tiles)
-        tile-lut (make-tile-lut boundary-lut)
-        grid-width (int (Math/sqrt (count tiles)))
-        _ (assert (= (* grid-width grid-width) (count tiles)))
-        solution (find-solution sym-count
+  (let [tiles             (read-tiles filename)
+        boundary-lut      (make-boundary-lut tiles)
+        tile-lut          (make-tile-lut boundary-lut)
+        grid-width        (int (Math/sqrt (count tiles)))
+        _                 (assert (= (* grid-width grid-width) (count tiles)))
+        solution          (find-solution sym-count
                                 (get-border-in boundary-lut)
                                 tile-lut
                                 (for [x (range grid-width) y (range grid-width)] [x y])
                                 (set (keys tiles))
                                 {})
-        w (dec grid-width)
-        _ (assert (some? solution) "No solution found")
-        answer (apply * (mapv (fmap first solution) [[0 0] [0 w] [w 0] [w w]]))
+        w                 (dec grid-width)
+        _                 (assert (some? solution) "No solution found")
+        answer            (apply * (mapv (fmap first solution) [[0 0] [0 w] [w 0] [w w]]))
         transformed-tiles (fmap #((actions (second %)) (tiles (first %))) solution)]
     [answer transformed-tiles]))
 
@@ -179,8 +179,8 @@
          "$9$10O$11O$12O$13O$14O$15O$16$17\n"))
 
 (defn show-monsters [img]
-  (let [w (-> img (str/split #"\n") first count)
-        tr (fn [offset] #(str/replace % (m-pattern offset) m-replacement))
+  (let [w   (-> img (str/split #"\n") first count)
+        tr  (fn [offset] #(str/replace % (m-pattern offset) m-replacement))
         trs (map tr (range (- w 19)))]
     (reduce (fn [i f] (f i)) img trs)))
 

@@ -21,7 +21,7 @@
          inclusions inclusions]
     (cond
       (some (comp empty? second) inclusions) nil
-      (empty? inclusions) dictionary
+      (empty? inclusions)                    dictionary
       :else
       (let [singletons   (filter (comp #(= (count %) 1) second) inclusions)
             new-pairs    (map (juxt first (comp first second)) singletons)

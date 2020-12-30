@@ -31,7 +31,7 @@
       (bit-and and-mask)
       (bit-or or-mask)))
 
-(def init-v1 {:mem {}
+(def init-v1 {:mem    {}
               :masker identity})
 
 (defn fw-v1 [state instr]
@@ -80,10 +80,10 @@
                    (assoc state :mapper (mapper m)))
            :set (let [[addr val] (vec args)
                       addresses  ((state :mapper) addr)
-                      mem' (reduce #(assoc %1 %2 val) (state :mem) addresses)]
+                      mem'       (reduce #(assoc %1 %2 val) (state :mem) addresses)]
                   (assoc state :mem mem')))))
 
-(def init-v2 {:mem {}
+(def init-v2 {:mem    {}
               :mapper (fn [a] [a])})
 
 (time
