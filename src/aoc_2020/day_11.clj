@@ -27,11 +27,10 @@
            (and (= 1 s) (>= cnt thresh))) [coor (bit-xor 1 s)])))
 
 (defn step [hood thresh state]
-  (p ::step
-     (let [inds   (keep-indexed (partial change-state-of thresh hood state) state)
-           state  (transient state)
-           state' (reduce (fn [st [i v]] (assoc! st i v)) state inds)]
-       (persistent! state'))))
+  (let [inds   (keep-indexed (partial change-state-of thresh hood state) state)
+        state  (transient state)
+        state' (reduce (fn [st [i v]] (assoc! st i v)) state inds)]
+    (persistent! state')))
 
 (defn find-fixed-point [xs]
   (->> xs
