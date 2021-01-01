@@ -1,5 +1,5 @@
 (ns aoc-2020.day-03
-  (:require [aoc-2020.util :as util]))
+  (:require [common.util :as util]))
 
 (defn find-trees-in
   "Given a line, returns the set of zero-based indices of its tree locations"

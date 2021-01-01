@@ -1,4 +1,4 @@
-(ns rrb-test
+(ns common.rrb-test
   (:require [clojure.core.rrb-vector :as fv]))
 
 (let [v (vector 1 2 3)

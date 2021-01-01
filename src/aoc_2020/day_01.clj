@@ -1,5 +1,5 @@
 (ns aoc-2020.day-01
-  (:require [aoc-2020.util :as util]
+  (:require [common.util :as util]
             [clojure.math.combinatorics :as combo]))
 
 (defn solve [input n]

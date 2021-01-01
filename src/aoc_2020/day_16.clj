@@ -1,5 +1,5 @@
 (ns aoc-2020.day-16
-  (:require [aoc-2020.util :as util]
+  (:require [common.util :as util]
             [clojure.string :as str]
             [clojure.edn :as edn]
             [clojure.algo.generic.functor :refer [fmap]]
@@ -36,8 +36,6 @@
 (time
  (part-1 "2020/day_16_input.txt"))
 ;; => 25972
-
-;; TODO: Part 2
 
 (defn set-in-domain [d s]
   (every? #(in-domain d %) s))

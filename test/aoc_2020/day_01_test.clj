@@ -1,6 +1,6 @@
 (ns aoc-2020.day-01-test
   (:require [aoc-2020.day-01 :as sut]
-            [aoc-2020.util :as util]
+            [common.util :as util]
             [clojure.test :as t]))
 
 (t/deftest simple-input

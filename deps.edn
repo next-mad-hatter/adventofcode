@@ -10,6 +10,8 @@
         org.clojure/core.match          {:mvn/version "1.0.0"}
         net.mikera/core.matrix          {:mvn/version "0.62.0"}
         org.clojure/core.rrb-vector     {:mvn/version "0.1.2"}
+        rhizome/rhizome                 {:mvn/version "0.2.9"}
+        criterium/criterium             {:mvn/version "0.4.6"}
         ;; org.clojure/data.finger-tree   {:mvn/version "0.0.3"}
         ;; org.clojure/core.logic         {:mvn/version "1.0.0"}
         ;; org.clojure/data.csv           {:mvn/version "1.0.0"}

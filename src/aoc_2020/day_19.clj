@@ -1,5 +1,5 @@
 (ns aoc-2020.day-19
-  (:require [aoc-2020.util :as util]
+  (:require [common.util :as util]
             [instaparse.core :as insta]
             [clojure.core.match :refer [match]]
             [clojure.string :as str]))

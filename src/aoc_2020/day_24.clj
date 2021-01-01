@@ -1,5 +1,5 @@
 (ns aoc-2020.day-24
-  (:require [aoc-2020.util :as util]
+  (:require [common.util :as util]
             [clojure.set :as set]))
 
 ;; See https://www.redblobgames.com/grids/hexagons/#coordinates

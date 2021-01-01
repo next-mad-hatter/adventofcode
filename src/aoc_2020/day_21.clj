@@ -1,5 +1,5 @@
 (ns aoc-2020.day-21
-  (:require [aoc-2020.util :as util]
+  (:require [common.util :as util]
             [clojure.set :as set]
             [clojure.algo.generic.functor :refer [fmap]]
             [clojure.string :as str]))

@@ -1,5 +1,5 @@
 (ns aoc-2020.day-09
-  (:require [aoc-2020.util :as util]
+  (:require [common.util :as util]
             [clojure.math.combinatorics :as combo]))
 
 ;; (def input-file "2020/day_09_test.txt")

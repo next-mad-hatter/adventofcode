@@ -1,5 +1,5 @@
 (ns aoc-2020.day-14
-  (:require [aoc-2020.util :as util]
+  (:require [common.util :as util]
             [clojure.edn :as edn]
             [clojure.string :as str]
             [clojure.math.combinatorics :as combo]
