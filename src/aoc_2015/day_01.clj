@@ -3,8 +3,7 @@
    [common.util :as util]))
 
 (defn parse [s]
-  (->> s
-       (map {\( +1 \) -1})))
+  (map {\( +1 \) -1} s))
 
 (defn guard [xs]
   (loop [p 1, s 0, xs xs]
