@@ -14,8 +14,11 @@
 (defn apply-to [op-map state [op [x1 y1 x2 y2]]]
   (->>
    (for [x (range x1 (inc x2))
-         y (range y1 (inc y2))]
-     #(update-in-state % (util/grid->flat 1000 x y) (op-map op)))
+         y (range y1 (inc y2))
+         :let
+         [ind (util/grid->flat 1000 x y)
+          op  (op-map op)]]
+     #(update-in-state % ind op))
    (reduce #(%2 %1) state)))
 
 (def init-state (vec (repeat 1000000 0)))
