@@ -42,3 +42,10 @@
 (defn split-in-two [s]
   [(take-nth 2 s)
    (take-nth 2 (rest s))])
+
+(defn grid->flat [width x y]
+  (+ x (* width y)))
+
+(defn flat->grid [width n]
+  [(int (/ n width)) (mod n width)])
+
