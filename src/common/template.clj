@@ -16,6 +16,9 @@
 
 #_(set! *warn-on-reflection* true)
 
+;; TODO: check out cider debugger + libs (sayid/debux/postmortem)
+;; http://www.futurile.net/2020/05/16/clojure-observability-and-debugging-tools/
+
 ;; TODO: check out kibit
 
 (util/fetch-whole "2015/day_01_test.txt")
