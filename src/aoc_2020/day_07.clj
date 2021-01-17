@@ -1,11 +1,10 @@
 (ns aoc-2020.day-07
-  (:require
-   [aoc-2020.util :as util]
-   [clojure.set :as set]
-   [clojure.algo.generic.functor :as gf :refer [fmap]]
-   [ubergraph.core :as uber]
-   [clojure.pprint :as pp]
-   [ubergraph.alg :as ga :refer [topsort]]))
+  (:require [common.util :as util]
+            [clojure.set :as set]
+            [clojure.algo.generic.functor :as gf :refer [fmap]]
+            [ubergraph.core :as uber]
+            [clojure.pprint :as pp]
+            [ubergraph.alg :refer [topsort]]))
 
 ;; TODO: check out loom, which provides subgraph-reachable-from & nested-count
 ;;       functions which we could use instead of rolling our own below
@@ -36,7 +35,7 @@
         parse-input
         uber/digraph)))
 
-(if-not (ga/topsort graph)
+(if-not (topsort graph)
   (throw (Exception. "Could not sort input -- maybe it contains a loop?")))
 
 ;; Part 1

@@ -1,6 +1,5 @@
 (ns aoc-2020.day-11
-  (:require [aoc-2020.util :as util]
-            [clojure.algo.generic.functor :refer [fmap]]
+  (:require [common.util :as util]
             [clojure.string :as str]))
 
 (defn lines->seats [lines]
@@ -21,15 +20,15 @@
        lines->seats))
 
 (defn change-state-of [thresh hood state coor s]
-  (let [cnt (reduce + 0 (map state (hood coor)))]
+  (let [cnt (reduce #(+ %1 (state %2)) 0 (hood coor))]
     (when (or
            (and (= 0 s) (= cnt 0))
            (and (= 1 s) (>= cnt thresh))) [coor (bit-xor 1 s)])))
 
 (defn step [hood thresh state]
-  (let [inds   (keep-indexed (partial change-state-of thresh hood state) state)
-        state  (transient state)
-        state' (reduce (fn [st [i v]] (assoc! st i v)) state inds)]
+  (let [changes (keep-indexed (partial change-state-of thresh hood state) state)
+        state   (transient state)
+        state'  (reduce (fn [st [i v]] (assoc! st i v)) state changes)]
     (persistent! state')))
 
 (defn find-fixed-point [xs]
@@ -42,12 +41,14 @@
   (into {} (mapv (comp (partial apply vector) rseq) (map-indexed vector xs))))
 
 (defn solve [construct-hood thresh filename]
-  (let [start (init filename)
-        hood  (construct-hood (start :seats))
-        tr    (enumerate (start :seats))
-        hood  (into {} (mapv (fn [[k v]] [(tr k) (filter some? (mapv tr v))]) hood))
-        hood  (mapv (comp seq second) (sort-by first (into [] hood)))
-        state (vec (repeat (count hood) 0))]
+  (let [seats (:seats (init filename))
+        tr    (enumerate seats)
+        hood  (->> seats
+                   construct-hood
+                   (map (fn [[k v]] [(tr k) (filter some? (mapv tr v))]))
+                   (sort-by first)
+                   (mapv (comp seq second)))
+        state (vec (repeat (count seats) 0))]
     (->> state
          (iterate (partial step hood thresh))
          (take 100000)
@@ -65,10 +66,7 @@
     [x y]))
 
 (defn construct-hood-1 [seats]
-  (let [mx  (apply max (map first seats))
-        my  (apply max (map last seats))
-        all (into {} (map (fn [coors] [coors (set (map #(mapv + coors %) eight-dirs))]) seats))]
-    (fmap #(set (filter (fn [[x y]] (and (<= 0 x mx) (<= 0 y my))) %)) all)))
+  (map (fn [coors] [coors (map #(mapv + coors %) eight-dirs)]) seats))
 
 (defn part-1 [filename]
   (solve construct-hood-1 4 filename))
@@ -98,8 +96,8 @@
                                   (contains? seats [x y])))
         neighbour (fn [coors dir] (util/find-first stop-at (ray coors dir)))
 
-        looks-at (fn [coors] (set (filter some? (map #(->> % (neighbour coors) seats) eight-dirs))))]
-    (into {} (map (fn [k] [k (looks-at k)]) seats))))
+        looks-at (fn [coors] (filter some? (map #(->> % (neighbour coors) seats) eight-dirs)))]
+    (map (fn [k] [k (looks-at k)]) seats)))
 
 (defn part-2 [filename]
   (solve construct-hood-2 5 filename))

@@ -1,9 +1,7 @@
 (ns aoc-2020.day-12
-  (:require
-   [aoc-2020.util :as util]
-   [clojure.string :as str]
-   [clojure.edn :as edn]
-   #_[clojure.core.matrix :as mat]))
+  (:require [common.util :as util]
+            [clojure.string :as str]
+            [clojure.edn :as edn]))
 
 (defn parse-line [line]
   (->> line
@@ -21,7 +19,7 @@
   (mapv + pos (map #(* val %) dir)))
 
 (defn step-one [state [op val]]
-  (let [dir-ops {:E 0 :N 1 :W 2 :S 3}
+  (let [dir-ops    {:E 0 :N 1 :W 2 :S 3}
         dir->delta [[1 0] [0 1] [-1 0] [0 -1]]]
     (cond
       (contains? dir-ops op)
@@ -66,7 +64,7 @@
   )
 
 (defn step-two [state [op val]]
-  (let [dir-ops {:E 0 :N 1 :W 2 :S 3}
+  (let [dir-ops    {:E 0 :N 1 :W 2 :S 3}
         dir->delta [[1 0] [0 1] [-1 0] [0 -1]]]
     (cond
       (contains? dir-ops op)
@@ -90,6 +88,8 @@
        (apply +)))
 
 (part-2 "2020/day_12_test.txt")
+;; => 286
 
 (time
  (part-2 "2020/day_12_input.txt"))
+;; => 52866

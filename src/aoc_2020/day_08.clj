@@ -1,7 +1,6 @@
 (ns aoc-2020.day-08
-  (:require
-   [aoc-2020.util :as util]
-   [clojure.string :as str]))
+  (:require [common.util :as util]
+            [clojure.string :as str]))
 
 (defn parse-line [line]
   (let [[op num] (str/split line #"\s+")]
@@ -44,7 +43,7 @@
    (run-vm input)))
 
 (def answer-1
-   (:acc simulated))
+  (:acc simulated))
 
 answer-1
 ;; => 1753
@@ -57,11 +56,12 @@ answer-1
 (defn find-first [f coll]
   (first (filter f coll)))
 
-(def answer-2
-  (let [ps   (indices-of #(#{:jmp :nop} (:op %)) input)
-        prgs (map #(update-in input [% :op] {:nop :jmp :jmp :nop}) ps)
-        res  (map run-vm prgs)]
-    (:acc (find-first #(= 0 (:exit %)) res))))
+(time
+ (def answer-2
+   (let [ps   (indices-of #(#{:jmp :nop} (:op %)) input)
+         prgs (map #(update-in input [% :op] {:nop :jmp :jmp :nop}) ps)
+         res  (map run-vm prgs)]
+     (:acc (find-first #(= 0 (:exit %)) res)))))
 
 answer-2
 ;; => 733

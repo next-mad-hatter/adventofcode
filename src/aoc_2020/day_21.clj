@@ -1,5 +1,5 @@
 (ns aoc-2020.day-21
-  (:require [aoc-2020.util :as util]
+  (:require [common.util :as util]
             [clojure.set :as set]
             [clojure.algo.generic.functor :refer [fmap]]
             [clojure.string :as str]))
@@ -21,7 +21,7 @@
          inclusions inclusions]
     (cond
       (some (comp empty? second) inclusions) nil
-      (empty? inclusions) dictionary
+      (empty? inclusions)                    dictionary
       :else
       (let [singletons   (filter (comp #(= (count %) 1) second) inclusions)
             new-pairs    (map (juxt first (comp first second)) singletons)

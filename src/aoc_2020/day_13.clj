@@ -1,12 +1,11 @@
 (ns aoc-2020.day-13
-  (:require
-   [aoc-2020.util :as util]
-   [clojure.string :as str]
-   [clojure.edn :as edn]))
+  (:require [common.util :as util]
+            [clojure.string :as str]
+            [clojure.edn :as edn]))
 
 (defn get-input-1 [filename]
-  (let [lines (util/fetch-lines filename)
-        stamp (first lines)
+  (let [lines   (util/fetch-lines filename)
+        stamp   (first lines)
         factors (remove #{"x"} (str/split (second lines) #","))]
     {:stamp (edn/read-string stamp) :factors (mapv edn/read-string factors)}))
 
@@ -28,7 +27,7 @@
 
 (defn parse-string-2 [input]
   (let [positioned (str/split input #",")
-        pairs (keep-indexed #(when (not= %2 "x") [%1 (edn/read-string %2)]) positioned)]
+        pairs      (keep-indexed #(when (not= %2 "x") [%1 (edn/read-string %2)]) positioned)]
     (map (fn [[a n]] [(mod (- a) n) n]) pairs)))
 
 (defn get-input-2 [filename]
@@ -42,7 +41,7 @@
          [t' t] [0 1]]
     (if (= r 0)
       [r' s' t']
-      (let [q (biginteger (/ r' r))
+      (let [q      (biginteger (/ r' r))
             [r' r] [r (- r' (* r q))]
             [s' s] [s (- s' (* s q))]
             [t' t] [t (- t' (* t q))]]
@@ -50,7 +49,7 @@
 
 (defn solve [[a' n'] [a'' n'']]
   (let [[g m' m''] (xgcd n' n'')
-        f (bigint (* n' n''))]
+        f          (bigint (* n' n''))]
     (when (not= 1 g) (throw (Exception. "Not coprime")))
     [(mod (+ (* a' m'' n'') (* a'' m' n')) f)
      f]))

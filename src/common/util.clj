@@ -1,4 +1,4 @@
-(ns aoc-2020.util
+(ns common.util
   (:require
    [clojure.java.io :as io]
    [clojure.string :as str]
@@ -23,7 +23,7 @@
          vec)))
 
 (defn indices-of [pred coll]
-   (keep-indexed #(when (pred %2) %1) coll))
+  (keep-indexed #(when (pred %2) %1) coll))
 
 (defn find-first [f coll]
   (first (filter f coll)))
@@ -33,8 +33,19 @@
   ([msg val] (print msg " ") (pp/pprint val) val))
 
 (defn re-pos [re s]
-  (loop [m (re-matcher re s)
+  (loop [m   (re-matcher re s)
          res {}]
     (if (.find m)
       (recur m (assoc res (.start m) (.group m)))
       res)))
+
+(defn split-in-two [s]
+  [(take-nth 2 s)
+   (take-nth 2 (rest s))])
+
+(defn grid->flat [width x y]
+  (+ x (* width y)))
+
+(defn flat->grid [width n]
+  [(int (/ n width)) (mod n width)])
+

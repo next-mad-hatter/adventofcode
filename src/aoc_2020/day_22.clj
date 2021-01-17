@@ -1,8 +1,7 @@
 (ns aoc-2020.day-22
-  (:require
-   [aoc-2020.util :as util]
-   [clojure.string :as str]
-   [clojure.edn :as edn]))
+  (:require [common.util :as util]
+            [clojure.string :as str]
+            [clojure.edn :as edn]))
 
 (defn parse-chunk [s]
   (let [lines (str/split-lines s)
@@ -53,8 +52,8 @@
 
 (defn play-2 [q1 q2]
   (loop [seen #{}
-         q1 q1
-         q2 q2]
+         q1   q1
+         q2   q2]
     (cond
       (seen [q1 q2]) [0 -1]
       (empty? q1)    [0 (score q2)]

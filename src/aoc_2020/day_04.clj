@@ -1,7 +1,6 @@
 (ns aoc-2020.day-04
-  (:require
-   [aoc-2020.util :as util]
-   [clojure.set :as set]))
+  (:require [common.util :as util]
+            [clojure.set :as set]))
 
 (defn parse [p]
   (as-> p v
