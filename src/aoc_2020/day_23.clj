@@ -64,8 +64,8 @@
   (let [ds    (read-input input)
         head  (first ds)
         lut   (initialize-lut head (pad-input ds padding))
-        iters (iterate step (transient lut))
-        res   (persistent! (nth iters n))]
+        iters (time (iterate step (transient lut)))
+        res   (time (persistent! (nth iters n)))]
     (formatter res)))
 
 (def part-1 (partial run 9 output-1))
