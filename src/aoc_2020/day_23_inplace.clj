@@ -1,8 +1,10 @@
-(ns aoc-2020.day-23
+(ns aoc-2020.day-23-inplace
   (:require [clojure.edn :as edn]
             [clojure.string :as str]))
 
 ;; FIXME: Can we improve speed without resorting to mutable arrays?
+
+(set! *warn-on-reflection* true)
 
 (defn read-input [s]
   (as-> s $
@@ -36,19 +38,18 @@
                      (let [i+ (mod (inc i) n)]
                        (mapv input (vector i i+)))))))))
 
-(defn step [lut]
-  (let [x      (lut 0)
-        a      (lut x)
-        b      (lut a)
-        c      (lut b)
-        y      (lut c)
-        l      (decrease x (dec (count lut)) #{a b c})
-        r      (lut l)
-        lut'   (assoc! lut x y)
-        lut''  (assoc! lut' c r)
-        lut''' (assoc! lut'' l a)
-        res    (assoc! lut''' 0 y)]
-    res))
+(defn step [^ints lut]
+  (let [x (aget lut 0)
+        a (aget lut x)
+        b (aget lut a)
+        c (aget lut b)
+        y (aget lut c)
+        l (decrease x (dec (count lut)) #{a b c})
+        r (aget lut l)]
+    (aset lut x y)
+    (aset lut c r)
+    (aset lut l a)
+    (aset lut 0 y)))
 
 (defn output-1 [lut]
   (let [iters (iterate #(lut %) 1)
@@ -61,11 +62,11 @@
     [a b]))
 
 (defn run [padding formatter n input]
-  (let [ds    (read-input input)
-        head  (first ds)
-        lut   (initialize-lut head (pad-input ds padding))
-        iters (iterate step (transient lut))
-        res   (persistent! (nth iters n))]
+  (let [ds   (read-input input)
+        head (first ds)
+        lut  (int-array (initialize-lut head (pad-input ds padding)))
+        _    (time (dotimes [_ n] (step lut)))
+        res  (vec lut)]
     (formatter res)))
 
 (def part-1 (partial run 9 output-1))
@@ -99,4 +100,3 @@ part-2-answer
 
 (apply * part-2-answer)
 ;; => 38162588308
-
